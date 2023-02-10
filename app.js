@@ -1,19 +1,17 @@
-const Koa = require('koa');
-const { readdir, mkdir } = require('node:fs/promises');
+const config = require('./config');
+const errorCatcher = require('./middleware/error.catcher');
+const aboutCompanyRoutes = require('./routes/about.company.routes');
+const cors = require('@koa/cors');
 
-(async () => {
-  try {
-    await readdir('./files');
-  } catch (error) {
-    mkdir('./files');
-  }
-})();
+const Koa = require('koa');
 
 const app = new Koa();
 
-app.use(ctx => {
-  ctx.status = 200;
-  ctx.body = 'hello'
-})
+app.use(errorCatcher);
+if (config.node.env === 'dev') {
+  app.use(cors());
+}
+
+app.use(aboutCompanyRoutes);
 
 module.exports = app;
