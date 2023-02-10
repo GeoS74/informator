@@ -6,10 +6,10 @@ const validator = require('../middleware/validators/about.params.validator');
 
 const router = new Router({ prefix: '/api/informator/about' });
 
-// router.get('/:id', validator.id, controller.get);
+router.get('/:alias', controller.get);
 router.get('/', controller.getAll);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
-// router.patch('/:id', koaBody({ multipart: true }), validator.id, validator.title, controller.update);
-// router.delete('/:id', validator.id, controller.delete);
+router.patch('/:alias', koaBody({ multipart: true }), validator.mdInfo, controller.update);
+router.delete('/:alias', controller.delete);
 
 module.exports = router.routes();

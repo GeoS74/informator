@@ -12,14 +12,16 @@ module.exports = async (ctx, next) => {
       return;
     }
 
-    logger.error(error.name);
-
-    if (error.name === 'ValidationError') {
+    // errors mongoDB
+    if (error.name) {
       ctx.status = 400;
-      ctx.body = {
-        error: error.message,
-      };
-      return;
+
+      switch (error.name) {
+        case 'TypeError':
+        case 'ValidationError':
+          ctx.body = { error: error.message };
+          return;
+      }
     }
 
     logger.error(error.message);
