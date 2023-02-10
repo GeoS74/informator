@@ -1,6 +1,5 @@
-const Position = require('../models/About');
-
-// const mapper = require('../mappers/brand.mapper');
+const About = require('../models/About');
+const mapper = require('../mappers/about.mapper');
 
 module.exports.get = async (ctx) => {
   // const brand = await _getBrand(ctx.params.id);
@@ -20,9 +19,12 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.add = async (ctx) => {
-  // const brand = await _addBrand(ctx.request.body.title);
+  const about = await About.create({
+    mdInfo: ctx.request.body.mdInfo,
+    alias: ctx.request.body.alias,
+  });
   ctx.status = 201;
-  // ctx.body = mapper(brand);
+  ctx.body = mapper(about);
 };
 
 module.exports.update = async (ctx) => {

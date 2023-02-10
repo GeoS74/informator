@@ -9,8 +9,8 @@ module.exports = {
     port: process.env.SERVER_PORT || 3200,
   },
   mongodb: {
-    uri: process.env.MONGO_DB || 'mongodb://localhost:27017/magnus',
-    autoindex: (process.env.NODE_ENV === 'dev' ? true : false),
+    uri: process.env.MONGO_DB || 'mongodb://localhost:27017/informator',
+    autoindex: (process.env.NODE_ENV === 'dev'),
   },
   log: {
     file: 'app.log',

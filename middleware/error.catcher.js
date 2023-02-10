@@ -12,24 +12,14 @@ module.exports = async (ctx, next) => {
       return;
     }
 
-    if (error.code) {
-      // ошибки PostgreSQL
-      if (error.code.toString() === '23503') {
-        ctx.status = 400;
-        ctx.body = {
-          error: 'проверьте правильность идентификатора бренда или поставщика',
-        };
-        return;
-      }
+    logger.error(error.name);
 
-      // ошибка koaBody если файл не передаётся
-      if (error.code.toString() === '1010') {
-        ctx.status = 400;
-        ctx.body = {
-          error: 'файл Excel не получен',
-        };
-        return;
-      }
+    if (error.name === 'ValidationError') {
+      ctx.status = 400;
+      ctx.body = {
+        error: error.message,
+      };
+      return;
     }
 
     logger.error(error.message);

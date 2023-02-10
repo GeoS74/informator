@@ -1,6 +1,9 @@
-const config = require('../config.js');
 const mongoose = require('mongoose');
+const config = require('../config');
 
-mongoose.plugin( require('mongoose-unique-validator') );
+mongoose.plugin(require('mongoose-unique-validator'));
 
-module.exports = mongoose.createConnection(config.mongodb.uri, { autoIndex: config.mongodb.autoindex });
+module.exports = mongoose.createConnection(
+  config.mongodb.uri,
+  { autoIndex: config.mongodb.autoindex },
+);
