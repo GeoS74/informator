@@ -9,7 +9,7 @@ module.exports = {
     port: process.env.SERVER_PORT || 3200,
   },
   mongodb: {
-    uri: process.env.MONGO_DB || 'mongodb://localhost:27017/informator',
+    uri: process.env.DB_HOST || 'mongodb://localhost:27017/informator',
     autoindex: (process.env.NODE_ENV === 'dev'),
   },
   log: {

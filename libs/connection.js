@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const config = require('../config');
 
+console.log("config")
+console.log(config)
+
 mongoose.plugin(require('mongoose-unique-validator'));
 
 module.exports = mongoose.createConnection(
