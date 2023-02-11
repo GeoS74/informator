@@ -10,7 +10,6 @@ const AboutSchema = new mongoose.Schema({
   },
   mdInfo: {
     type: String,
-    required: 'даных нет',
   },
 });
 
