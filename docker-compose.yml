@@ -1,12 +1,10 @@
 version: '1.0'
 services:
-  db:
+  mdb:
       image: "mongo"
-      # volumes:
-      #   - ./libs:/docker-entrypoint-initdb.d
-      # environment:
-      #   - MONGO_INITDB_ROOT_USERNAME=root
-      #   - MONGO_INITDB_ROOT_PASSWORD=passwords
+      environment:
+        - MONGO_INITDB_ROOT_USERNAME=root
+        - MONGO_INITDB_ROOT_PASSWORD=passwordXXX
   bridge_app:
     build: .
     ports:
@@ -14,5 +12,8 @@ services:
     environment:
       - SERVER_PORT=3200
       - NODE_ENV=dev
-      # - DB_HOST=mongodb://root:password@db:27017/informator
-      - DB_HOST=mongodb://db:27017/informator
+      - DB_USER=root
+      - DB_PASS=passwordXXX
+      - DB_HOST=mdb
+      - DB_PORT=27017
+      - DB_NAME=admin
