@@ -10,10 +10,10 @@ module.exports = mongoose.createConnection(
 
 function _makeURI() {
   let uri = 'mongodb://';
-  if(config.mongodb.user && config.mongodb.password) {
+  if (config.mongodb.user && config.mongodb.password) {
     uri += `${config.mongodb.user}:${config.mongodb.password}@`;
   }
   uri += `${config.mongodb.host}:${config.mongodb.port}`;
-  uri += `/${config.mongodb.database}`
+  uri += `/${config.mongodb.database}`;
   return uri;
 }

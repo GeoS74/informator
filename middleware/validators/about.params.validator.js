@@ -15,7 +15,7 @@ module.exports.mdInfo = async (ctx, next) => {
     ctx.throw(400, 'invalid mdInfo');
   }
   await next();
-}
+};
 
 function _checkMdInfo(mdInfo) {
   return mdInfo?.trim();

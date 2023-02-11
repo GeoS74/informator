@@ -21,6 +21,7 @@ module.exports = async (ctx, next) => {
         case 'ValidationError':
           ctx.body = { error: error.message };
           return;
+        default:
       }
     }
 

@@ -14,7 +14,7 @@ module.exports.getAll = async (ctx) => {
   const abouts = await About.find().sort({ _id: 1 });
 
   ctx.status = 200;
-  ctx.body = abouts.map(about => (mapper(about)));
+  ctx.body = abouts.map((about) => (mapper(about)));
 };
 
 module.exports.add = async (ctx) => {
@@ -32,8 +32,8 @@ module.exports.update = async (ctx) => {
     { mdInfo: ctx.request.body.mdInfo.trim() },
     {
       new: true,
-      runValidators: true //запускает валидаторы схемы перед записью
-    }
+      runValidators: true, // запускает валидаторы схемы перед записью
+    },
   );
 
   if (!about) {
@@ -45,7 +45,7 @@ module.exports.update = async (ctx) => {
 
 module.exports.delete = async (ctx) => {
   const about = await About.findOneAndDelete(
-    { alias: ctx.params.alias }
+    { alias: ctx.params.alias },
   );
 
   if (!about) {
