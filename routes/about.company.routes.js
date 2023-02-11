@@ -9,7 +9,7 @@ const router = new Router({ prefix: '/api/informator/about' });
 router.get('/:alias', controller.get);
 router.get('/', controller.getAll);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
-router.patch('/:alias', koaBody({ multipart: true }), validator.mdInfo, controller.update);
+router.patch('/:alias', koaBody({ multipart: true }), controller.update);
 router.delete('/:alias', controller.delete);
 
 module.exports = router.routes();
