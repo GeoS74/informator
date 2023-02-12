@@ -1,6 +1,6 @@
 version: '1.0'
 services:
-  mdb:
+  db_info:
       image: "mongo"
       environment:
         - MONGO_INITDB_ROOT_USERNAME=root
@@ -14,7 +14,7 @@ services:
       - NODE_ENV=dev
       - DB_USER=root
       - DB_PASS=passwordXXX
-      - DB_HOST=mdb
+      - DB_HOST=db_info
       - DB_PORT=27017
       - DB_NAME=admin
       - JWT_CHECK=true
