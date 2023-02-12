@@ -16,6 +16,10 @@ module.exports = {
     port: process.env.DB_PORT || 27017,
     database: process.env.DB_NAME || 'informator',
   },
+  jwt: {
+    check: process.env.JWT_CHECK === 'true',
+    secretKey: process.env.JWT_SECRET_KEY || 'any secret phrase',
+  },
   log: {
     file: 'app.log',
   },
