@@ -3,6 +3,7 @@ const Koa = require('koa');
 const config = require('./config');
 const errorCatcher = require('./middleware/error.catcher');
 const aboutCompanyRoutes = require('./routes/about.company.routes');
+const UserRoutes = require('./routes/user.routes');
 
 const app = new Koa();
 
@@ -12,5 +13,6 @@ if (config.node.env === 'dev') {
 }
 
 app.use(aboutCompanyRoutes);
+app.use(UserRoutes);
 
 module.exports = app;

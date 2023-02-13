@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const connection = require('../libs/connection');
 
-const AboutSchema = new mongoose.Schema({
+const Schema = new mongoose.Schema({
   alias: {
     type: String,
     unique: 'Не уникальное значение {PATH}',
@@ -13,4 +13,4 @@ const AboutSchema = new mongoose.Schema({
   },
 });
 
-module.exports = connection.model('About', AboutSchema);
+module.exports = connection.model('About', Schema);

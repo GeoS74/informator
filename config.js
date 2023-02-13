@@ -18,7 +18,7 @@ module.exports = {
   },
   jwt: {
     check: process.env.JWT_CHECK === 'true',
-    secretKey: process.env.JWT_SECRET_KEY || 'any secret phrase',
+    secretKey: process.env.JWT_SECRET_KEY || 'any_secret',
   },
   log: {
     file: 'app.log',
