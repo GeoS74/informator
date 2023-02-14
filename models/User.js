@@ -9,10 +9,6 @@ const Schema = new mongoose.Schema({
     required: 'не заполнено обязательное поле {PATH}',
     unique: 'Не уникальное значение {PATH}',
   },
-  rank: {
-    type: String,
-    required: 'не заполнено обязательное поле {PATH}',
-  },
   position: String,
   photo: String,
 }, {
