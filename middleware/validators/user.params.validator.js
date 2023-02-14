@@ -2,6 +2,14 @@ const fs = require('fs/promises');
 
 const logger = require('../../libs/logger');
 
+module.exports.email = async (ctx, next) => {
+  if (!_checkEmail(ctx?.user?.email)) {
+    ctx.throw(400, 'invalid email');
+  }
+
+  await next();
+};
+
 module.exports.params = async (ctx, next) => {
   if (!_checkPosition(ctx.request?.body?.position)) {
     ctx.throw(400, 'invalid position');
@@ -14,10 +22,6 @@ module.exports.params = async (ctx, next) => {
 
   await next();
 };
-
-function _checkPosition() {
-  return true;
-}
 
 module.exports.photo = async (ctx, next) => {
   if (!ctx.request?.files) {
@@ -53,6 +57,14 @@ module.exports.photo = async (ctx, next) => {
 
   await next();
 };
+
+function _checkEmail(email) {
+  return !!email;
+}
+
+function _checkPosition() {
+  return true;
+}
 
 function _deleteFile(files) {
   for (const file of Object.values(files)) {
