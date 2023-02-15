@@ -1,5 +1,5 @@
 const fs = require('fs/promises');
-const sharp = require('sharp');
+// const sharp = require('sharp');
 
 const logger = require('../libs/logger');
 
@@ -68,9 +68,11 @@ module.exports.photo = async (ctx) => {
     _deleteFile(`./files/photo/${user.photo}`);
   }
 
+  fs.rename(ctx.photo.filepath, `./files/photo/${ctx.photo.newFilename}`);
+
   /* change size photo */
-  await _processingPhoto(ctx.photo)
-    .catch((error) => ctx.throw(400, error.message));
+  // await _processingPhoto(ctx.photo)
+  //   .catch((error) => ctx.throw(400, error.message));
 
   _deleteFile(ctx.photo.filepath);
 
@@ -125,11 +127,11 @@ function _deleteFile(fpath) {
     .catch((error) => logger.error(`delete file: ${error.message}`));
 }
 
-function _processingPhoto({ filepath, newFilename }) {
-  return sharp(filepath)
-    .resize({
-      width: 160,
-      height: 160,
-    })
-    .toFile(`./files/photo/${newFilename}`);
-}
+// function _processingPhoto({ filepath, newFilename }) {
+//   return sharp(filepath)
+//     .resize({
+//       width: 160,
+//       height: 160,
+//     })
+//     .toFile(`./files/photo/${newFilename}`);
+// }
