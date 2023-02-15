@@ -67,17 +67,12 @@ module.exports.photo = async (ctx) => {
   if (user.photo) {
     _deleteFile(`./files/photo/${user.photo}`);
   }
-  
+
   /* change size photo */
-  await sharp(ctx.photo.filepath)
-        .resize({
-            width: 160,
-            height: 160,
-        })
-        .toFile(`./files/photo/${ctx.photo.newFilename}`)
-        .catch(error => ctx.throw(400, error.message));
- 
-  _deleteFile(ctx.photo.filepath)
+  await _processingPhoto(ctx.photo)
+    .catch((error) => ctx.throw(400, error.message));
+
+  _deleteFile(ctx.photo.filepath);
 
   await this.get(ctx);
 };
@@ -128,4 +123,13 @@ function _updatePhoto(email, photo) {
 function _deleteFile(fpath) {
   fs.unlink(fpath)
     .catch((error) => logger.error(`delete file: ${error.message}`));
+}
+
+function _processingPhoto({ filepath, newFilename }) {
+  return sharp(filepath)
+    .resize({
+      width: 160,
+      height: 160,
+    })
+    .toFile(`./files/photo/${newFilename}`);
 }
