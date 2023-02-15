@@ -20,7 +20,7 @@ const accessCheck = require('../middleware/access.check');
 
 const optional = {
   formidable: {
-    uploadDir: './files/photo',
+    uploadDir: './files',
     allowEmptyFiles: false,
     minFileSize: 1,
     multiples: true,
