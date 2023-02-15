@@ -52,4 +52,4 @@ router.patch('/photo', koaBody(optional), validator.photo, controller.photo);
 module.exports.routes = router.routes();
 
 // static files
-module.exports.static = mount('/api/informator/user/photos', serve('./files/photo'));
+module.exports.static = mount('/api/informator/user/photo', serve('./files/photo'));
