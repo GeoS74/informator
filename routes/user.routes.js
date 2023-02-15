@@ -1,6 +1,8 @@
 const { readdir, mkdir } = require('node:fs/promises');
 const Router = require('koa-router');
 const { koaBody } = require('koa-body');
+const serve = require('koa-static');
+const mount = require('koa-mount');
 
 const controller = require('../controllers/user.controller');
 const validator = require('../middleware/validators/user.params.validator');
@@ -45,6 +47,9 @@ router.patch('/', koaBody({ multipart: true }), validator.params, controller.upd
 router.delete('/', controller.delete);
 
 router.all('/photo', accessCheck, validator.email);
-router.put('/photo', koaBody(optional), controller.photo);
+router.patch('/photo', koaBody(optional), validator.photo, controller.photo);
 
-module.exports = router.routes();
+module.exports.routes = router.routes();
+
+// static files
+module.exports.static = mount('/api/informator/user/photos', serve('./files/photo'));

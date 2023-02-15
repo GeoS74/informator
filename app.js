@@ -1,5 +1,6 @@
-const cors = require('@koa/cors');
 const Koa = require('koa');
+const cors = require('@koa/cors');
+
 const config = require('./config');
 const errorCatcher = require('./middleware/error.catcher');
 const aboutCompanyRoutes = require('./routes/about.company.routes');
@@ -13,6 +14,7 @@ if (config.node.env === 'dev') {
 }
 
 app.use(aboutCompanyRoutes);
-app.use(UserRoutes);
+app.use(UserRoutes.routes);
+app.use(UserRoutes.static);
 
 module.exports = app;
