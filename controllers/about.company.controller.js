@@ -2,7 +2,8 @@ const About = require('../models/About');
 const mapper = require('../mappers/about.mapper');
 
 module.exports.get = async (ctx) => {
-  const about = _getAbout(ctx.params.alias);
+  const about = await _getAbout(ctx.params.alias);
+
   if (!about) {
     ctx.throw(404, 'alias not found');
   }
