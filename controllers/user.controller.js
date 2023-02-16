@@ -47,7 +47,7 @@ module.exports.delete = async (ctx) => {
   }
 
   /* delete photo */
-  if (user.photo) {
+  if (user?.photo) {
     _deleteFile(`./files/photo/${user.photo}`);
   }
 
@@ -64,11 +64,11 @@ module.exports.photo = async (ctx) => {
   }
 
   /* delete old photo */
-  if (user.photo) {
+  if (user?.photo) {
     _deleteFile(`./files/photo/${user.photo}`);
   }
 
-  fs.rename(ctx.photo.filepath, `./files/photo/${ctx.photo.newFilename}`);
+  await fs.rename(ctx.photo.filepath, `./files/photo/${ctx.photo.newFilename}`);
 
   /* change size photo */
   // await _processingPhoto(ctx.photo)
