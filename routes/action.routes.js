@@ -1,11 +1,11 @@
 const Router = require('koa-router');
 const { koaBody } = require('koa-body');
 
-const controller = require('../controllers/role.controller');
-const validator = require('../middleware/validators/role.params.validator');
+const controller = require('../controllers/action.controller');
+const validator = require('../middleware/validators/action.params.validator');
 const accessCheck = require('../middleware/access.check');
 
-const router = new Router({ prefix: '/api/role' });
+const router = new Router({ prefix: '/api/action' });
 
 router.use(accessCheck);
 router.get('/:id', validator.objectId, controller.get);

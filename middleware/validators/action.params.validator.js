@@ -2,7 +2,7 @@ const { isValidObjectId } = require('mongoose');
 
 module.exports.title = async (ctx, next) => {
   if (!_checkTitle(ctx.request?.body?.title)) {
-    ctx.throw(400, 'invalid role title');
+    ctx.throw(400, 'invalid action title');
   }
 
   await next();
@@ -10,7 +10,7 @@ module.exports.title = async (ctx, next) => {
 
 module.exports.objectId = async (ctx, next) => {
   if (!_checkObjectId(ctx.params.id)) {
-    ctx.throw(400, 'invalid role id');
+    ctx.throw(400, 'invalid action id');
   }
 
   await next();

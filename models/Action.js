@@ -10,4 +10,4 @@ const Schema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = connection.model('Role', Schema);
+module.exports = connection.model('Action', Schema);
