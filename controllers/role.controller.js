@@ -12,7 +12,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const roles = await _getRoleAll();
+  const roles = ctx.query?.title
+    ? await _searchRole(ctx.query.title)
+    : await _getRoleAll();
 
   ctx.status = 200;
   ctx.body = roles.map((role) => (mapper(role)));
@@ -69,4 +71,22 @@ function _updateRole(id, title) {
 
 function _deleteRole(id) {
   return Role.findByIdAndDelete(id);
+}
+
+async function _searchRole(title) {
+  const filter = {
+    $text: {
+      $search: title,
+      $language: 'russian',
+    },
+  };
+
+  const projection = {
+    score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
+  };
+  return Role.find(filter, projection)
+    .sort({
+      _id: -1,
+      // score: { $meta: "textScore" } //сортировка по релевантности
+    });
 }

@@ -5,7 +5,7 @@ const controller = require('../controllers/action.controller');
 const validator = require('../middleware/validators/action.params.validator');
 const accessCheck = require('../middleware/access.check');
 
-const router = new Router({ prefix: '/api/action' });
+const router = new Router({ prefix: '/api/informator/action' });
 
 router.use(accessCheck);
 router.get('/:id', validator.objectId, controller.get);

@@ -10,4 +10,14 @@ const Schema = new mongoose.Schema({
   timestamps: true,
 });
 
+Schema.index(
+  {
+    title: 'text',
+  },
+  {
+    name: 'RoleSearchIndex',
+    default_language: 'russian',
+  },
+);
+
 module.exports = connection.model('Action', Schema);

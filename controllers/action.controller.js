@@ -12,7 +12,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const actions = await _getActionAll();
+  const actions = ctx.query?.title
+    ? await _searchAction(ctx.query.title)
+    : await _getActionAll();
 
   ctx.status = 200;
   ctx.body = actions.map((action) => (mapper(action)));
@@ -69,4 +71,22 @@ function _updateAction(id, title) {
 
 function _deleteAction(id) {
   return Action.findByIdAndDelete(id);
+}
+
+async function _searchAction(title) {
+  const filter = {
+    $text: {
+      $search: title,
+      $language: 'russian',
+    },
+  };
+
+  const projection = {
+    score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
+  };
+  return Action.find(filter, projection)
+    .sort({
+      _id: -1,
+      //  score: { $meta: "textScore" } //сортировка по релевантности
+    });
 }

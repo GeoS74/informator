@@ -5,7 +5,7 @@ const controller = require('../controllers/role.controller');
 const validator = require('../middleware/validators/role.params.validator');
 const accessCheck = require('../middleware/access.check');
 
-const router = new Router({ prefix: '/api/role' });
+const router = new Router({ prefix: '/api/informator/role' });
 
 router.use(accessCheck);
 router.get('/:id', validator.objectId, controller.get);
