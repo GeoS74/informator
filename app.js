@@ -4,7 +4,8 @@ const cors = require('@koa/cors');
 const config = require('./config');
 const errorCatcher = require('./middleware/error.catcher');
 const aboutCompanyRoutes = require('./routes/about.company.routes');
-const UserRoutes = require('./routes/user.routes');
+const userRoutes = require('./routes/user.routes');
+const roleRoutes = require('./routes/role.routes');
 
 const app = new Koa();
 
@@ -14,7 +15,8 @@ if (config.node.env === 'dev') {
 }
 
 app.use(aboutCompanyRoutes);
-app.use(UserRoutes.routes);
-app.use(UserRoutes.static);
+app.use(userRoutes.routes);
+app.use(userRoutes.static);
+app.use(roleRoutes)
 
 module.exports = app;
