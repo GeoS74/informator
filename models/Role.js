@@ -4,7 +4,7 @@ const connection = require('../libs/connection');
 const Schema = new mongoose.Schema({
   title: {
     type: String,
-    // unique: 'Не уникальное значение {PATH}',
+    unique: 'Не уникальное значение {PATH}',
   },
 }, {
   timestamps: true,

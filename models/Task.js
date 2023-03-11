@@ -15,9 +15,9 @@ Schema.index(
     title: 'text',
   },
   {
-    name: 'ActionSearchIndex',
+    name: 'TaskSearchIndex',
     default_language: 'russian',
   },
 );
 
-module.exports = connection.model('Action', Schema);
+module.exports = connection.model('Task', Schema);
