@@ -8,6 +8,7 @@ const userRoutes = require('./routes/user.routes');
 const roleRoutes = require('./routes/role.routes');
 const actionRoutes = require('./routes/action.routes');
 const taskRoutes = require('./routes/task.routes');
+const accessSettingRoutes = require('./routes/access.setting.routes');
 
 const app = new Koa();
 
@@ -22,5 +23,6 @@ app.use(userRoutes.static);
 app.use(roleRoutes);
 app.use(actionRoutes);
 app.use(taskRoutes);
+app.use(accessSettingRoutes);
 
 module.exports = app;
