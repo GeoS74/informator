@@ -1,15 +1,15 @@
 const mongoose = require('mongoose');
 const connection = require('../libs/connection');
-// const Role = require('./Role');
+// const Action = require('./Action');
 
 const Schema = new mongoose.Schema({
   title: {
     type: String,
     unique: 'Не уникальное значение {PATH}',
   },
-  // roles: {
+  // actions: {
   //   type: [mongoose.Schema.Types.ObjectId],
-  //   ref: Role,
+  //   ref: Action,
   // }
 }, {
   timestamps: true,

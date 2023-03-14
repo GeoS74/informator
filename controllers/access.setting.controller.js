@@ -22,11 +22,8 @@ const Role = require('../models/Role')
 // };
 
 module.exports.add = async (ctx) => {
-  // await _addRoleToTasks(ctx.request.body)
-
+  await _addRoleToTasks(ctx.request.body)
   await _show();
-
-  // console.log(ctx.request.body)
 
   ctx.body = 'ok';
 
@@ -35,31 +32,62 @@ module.exports.add = async (ctx) => {
   // ctx.body = mapper(action);
 };
 
-async function _show(){
+async function _show() {
+  const foo = await Role.find({}).populate('tasks.task').populate('tasks.actions')
+  // .populate('actions')
 
-  const foo = await Role.find({}).populate('tasks')
+  // console.log(foo)
 
-foo.map(e => {
-  console.log(e)
-})
+  foo.map(e => {
+    console.log(e);
+    console.log('!!!!!!!!!!!!!!!!')
+    // console.log(e.tasks)
 
-   
+    e.tasks.map(console.log)
+
+    console.log('............')
+  })
 }
 
 
 async function _addRoleToTasks(roles) {
-  for (let role in roles) {
-    const tasks = Object.keys(roles[role])
+  // console.log(roles);
+  // console.log('--------------------');
 
+  for (let role in roles) {
+    // const tasks = Object.keys(roles[role]).map(e => e.substring(3));
+    const tasks = _getIdActiveTasks(roles[role]);
+
+    // console.log(tasks);
     const foo = await Role.findByIdAndUpdate(
       role.substring(3),
-      {tasks: tasks.map(e => e.substring(3))}
+      { tasks: tasks }
     )
 
-    console.log(foo)
+    // console.log(foo)
     // for(let task in role) {
     // }
   }
+}
+
+function _getIdActiveTasks(role) {
+  const result = [];
+
+  for(let id_task in role) {
+    if(role[id_task]['0']) {
+      result.push({
+        task: id_task.substring(3),
+
+        actions: Object.keys(role[id_task])
+        .filter(a => (a === '0') ? false : true)
+        .map(a => a.substring(3)),
+
+        // test: 
+      })
+    }
+  }
+  // console.log(role)
+  return result;
 }
 
 
