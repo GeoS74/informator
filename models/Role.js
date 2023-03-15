@@ -3,11 +3,7 @@ const connection = require('../libs/connection');
 const Task = require('./Task');
 const Action = require('./Action');
 
-const Bar = new mongoose.Schema({
-
-})
-
-const Foo = new mongoose.Schema({
+const BundleTaskToActions = new mongoose.Schema({
   task: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Task,
@@ -23,11 +19,7 @@ const Schema = new mongoose.Schema({
     type: String,
     unique: 'Не уникальное значение {PATH}',
   },
-  tasks: {
-    // type: [mongoose.Schema.Types.ObjectId],
-    type: [Foo],
-    // ref: Task,
-  },
+  tasks: [BundleTaskToActions],
 }, {
   timestamps: true,
 });
