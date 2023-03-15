@@ -9,6 +9,6 @@ const router = new Router({ prefix: '/api/informator/setting/access' });
 
 router.use(accessCheck);
 router.get('/', controller.get);
-router.post('/', koaBody({ multipart: true }), controller.add);
+router.post('/', koaBody({ multipart: true }), /* check ObjectId for validity */ controller.add);
 
 module.exports = router.routes();
