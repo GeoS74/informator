@@ -40,7 +40,7 @@ const router = new Router({ prefix: '/api/informator/user' });
 
 router.all('/', accessCheck, validator.email);
 
-// router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
+router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
 router.get('/', controller.get);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
 router.patch('/', koaBody({ multipart: true }), validator.params, controller.update);
