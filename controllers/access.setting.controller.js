@@ -19,11 +19,13 @@ module.exports.add = async (ctx) => {
 
 async function _getAccessSettings() {
   return Role.find({})
-    .populate('tasks.task')
-    .populate('tasks.actions');
+    .populate('directings.directing')
+    .populate('directings.tasks.task')
+    .populate('directings.tasks.actions');
 }
 
 async function _addRoleToTasks(roles) {
+  // console.log(roles)
   for (const role in roles) {
     if ({}.hasOwnProperty.call(roles, role)) {
       const tasks = _getIdActiveTasks(roles[role]);
@@ -39,7 +41,7 @@ async function _addRoleToTasks(roles) {
 
 function _getIdActiveTasks(role) {
   const result = [];
-// console.log(role)
+  console.log(role)
 
   for (const idTask in role) {
     if (role[idTask]['0']) {
