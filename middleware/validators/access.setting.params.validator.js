@@ -11,4 +11,3 @@ module.exports.objectId = async (ctx, next) => {
 function _checkObjectId(id) {
   return isValidObjectId(id);
 }
-
