@@ -3,7 +3,7 @@ module.exports = (data) => data.map((role) => ({
   title: role.title,
 
   directings: role.directings.map((d) => ({
-    id: d._id,
+    id: d.directing._id,
     title: d.directing.title,
 
     tasks: d.tasks.map((t) => ({
