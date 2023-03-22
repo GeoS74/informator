@@ -38,7 +38,7 @@ const router = new Router({ prefix: '/api/informator/user' });
 * если проверка access токена выключена, срабатывает валидатор email
 */
 
-router.all('/', accessCheck, validator.email);
+router.use(accessCheck, validator.email);
 
 router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
 router.get('/', controller.get);
@@ -46,7 +46,6 @@ router.post('/', koaBody({ multipart: true }), validator.params, controller.add)
 router.patch('/', koaBody({ multipart: true }), validator.params, controller.update);
 router.delete('/', controller.delete);
 
-router.all('/photo', accessCheck, validator.email);
 router.patch('/photo', koaBody(optional), validator.photo, controller.photo);
 
 module.exports.routes = router.routes();
