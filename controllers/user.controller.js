@@ -17,7 +17,7 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const users = await _getAllUsers();
+  const users = await _getAllUsers().populate('roles');
 
   ctx.status = 200;
   ctx.body = users.map((user) => mapper(user));
