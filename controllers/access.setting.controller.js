@@ -76,7 +76,6 @@ function _getTasks(directing) {
     // если нет - состояния чекбоксов действий не сохраняются
     // активность - это наличие ключа '0' со значением 'on'
     if ({}.hasOwnProperty.call(directing[idTask], '0')) {
-
       if (idTask !== '0') { // игнорировать ключ '0'
         result.push({
           task: idTask.substring(3),
