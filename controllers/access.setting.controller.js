@@ -33,7 +33,7 @@ module.exports.bundleRole = async (ctx) => {
 function _updateBundleRoleToUser(email, roleId) {
   return User.findOneAndUpdate(
     { email },
-    { roles: [roleId] },
+    { roles: roleId ? [roleId] : [] },
     {
       new: true,
       runValidators: true, // запускает валидаторы схемы перед записью

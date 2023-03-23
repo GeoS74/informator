@@ -8,8 +8,14 @@ module.exports.objectId = async (ctx, next) => {
   await next();
 };
 
+// если id роли не передаётся, то роль отвязывается от пользователя
 module.exports.roleId = async (ctx, next) => {
-  if (!_checkObjectId(ctx.request?.body?.roleId)) {
+  if (!ctx.request?.body?.roleId) {
+    await next();
+    return;
+  }
+
+  if (!_checkObjectId(ctx.request.body.roleId)) {
     ctx.throw(400, 'invalid role id');
   }
 
