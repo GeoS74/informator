@@ -1,5 +1,7 @@
 const Role = require('../models/Role');
+const User = require('../models/User');
 const mapper = require('../mappers/access.setting.mapper');
+const userMapper = require('../mappers/user.mapper');
 
 module.exports.get = async (ctx) => {
   const settings = await _getAccessSettings();
@@ -16,6 +18,28 @@ module.exports.add = async (ctx) => {
     message: 'saved access setting',
   };
 };
+
+module.exports.bundleRole = async (ctx) => {
+  const user = await _updateBundleRoleToUser(ctx.request.body.email, ctx.request.body.roleId);
+
+  if (!user) {
+    ctx.throw(404, 'user not found');
+  }
+
+  ctx.status = 200;
+  ctx.body = userMapper(user);
+};
+
+function _updateBundleRoleToUser(email, roleId) {
+  return User.findOneAndUpdate(
+    { email },
+    { roles: [roleId] },
+    {
+      new: true,
+      runValidators: true, // запускает валидаторы схемы перед записью
+    },
+  ).populate('roles');
+}
 
 async function _getAccessSettings() {
   return Role.find({})

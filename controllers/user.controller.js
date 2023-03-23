@@ -80,11 +80,11 @@ module.exports.photo = async (ctx) => {
 };
 
 function _getUser({ email }) {
-  return User.findOne({ email });
+  return User.findOne({ email }).populate('roles');
 }
 
 function _getAllUsers() {
-  return User.find().sort({ _id: 1 });
+  return User.find().sort({ _id: 1 }).populate('roles');
 }
 
 function _addUser({ email, position }) {
@@ -102,13 +102,15 @@ function _updateUser({ email, position }) {
       new: true,
       runValidators: true, // запускает валидаторы схемы перед записью
     },
-  );
+  )
+    .populate('roles');
 }
 
 function _delUser({ email }) {
   return User.findOneAndDelete(
     { email },
-  );
+  )
+    .populate('roles');
 }
 
 function _updatePhoto(email, photo) {
@@ -119,7 +121,8 @@ function _updatePhoto(email, photo) {
       new: false,
       runValidators: true, // запускает валидаторы схемы перед записью
     },
-  );
+  )
+    .populate('roles');
 }
 
 function _deleteFile(fpath) {
