@@ -42,6 +42,7 @@ router.use(accessCheck, validator.email);
 
 router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
 router.get('/', controller.get);
+router.get('/search', controller.search);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
 router.patch('/', koaBody({ multipart: true }), validator.params, controller.update);
 router.delete('/', controller.delete);

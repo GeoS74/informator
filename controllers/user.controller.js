@@ -23,6 +23,13 @@ module.exports.getAll = async (ctx) => {
   ctx.body = users.map((user) => mapper(user));
 };
 
+module.exports.search = async (ctx) => {
+  const users = await _searchUsers(ctx.query?.email || '').populate('roles');
+
+  ctx.status = 200;
+  ctx.body = users.map((user) => mapper(user));
+};
+
 module.exports.add = async (ctx) => {
   const user = await _addUser(ctx.user);
 
@@ -85,6 +92,15 @@ function _getUser({ email }) {
 
 function _getAllUsers() {
   return User.find().sort({ _id: 1 }).populate('roles');
+}
+
+function _searchUsers(needle) {
+  return User.find({
+    email: {
+      $regex: new RegExp(`${needle}`),
+      $options: 'i',
+    },
+  }).sort({ _id: 1 }).populate('roles');
 }
 
 function _addUser({ email, position }) {
