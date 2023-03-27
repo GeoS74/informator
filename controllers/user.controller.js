@@ -94,7 +94,7 @@ function _getUser({ email }) {
         { path: 'directings.directing' },
         { path: 'directings.tasks.task' },
         { path: 'directings.tasks.actions' },
-      ]
+      ],
     });
 }
 
@@ -106,7 +106,7 @@ function _getAllUsers() {
         { path: 'directings.directing' },
         { path: 'directings.tasks.task' },
         { path: 'directings.tasks.actions' },
-      ]
+      ],
     });
 }
 
@@ -124,7 +124,7 @@ function _searchUsers(needle) {
         { path: 'directings.directing' },
         { path: 'directings.tasks.task' },
         { path: 'directings.tasks.actions' },
-      ]
+      ],
     });
 }
 
@@ -150,7 +150,7 @@ function _updateUser({ email, status }) {
         { path: 'directings.directing' },
         { path: 'directings.tasks.task' },
         { path: 'directings.tasks.actions' },
-      ]
+      ],
     });
 }
 
@@ -164,7 +164,7 @@ function _delUser({ email }) {
         { path: 'directings.directing' },
         { path: 'directings.tasks.task' },
         { path: 'directings.tasks.actions' },
-      ]
+      ],
     });
 }
 
