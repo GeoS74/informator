@@ -5,4 +5,4 @@ db.actions.insertMany([
   { title: 'Утвердить' },
   { title: 'Согласовать' },
   { title: 'Ознакомиться' },
-])
+]);
