@@ -5,7 +5,8 @@ services:
       environment:
         - MONGO_INITDB_ROOT_USERNAME=root
         - MONGO_INITDB_ROOT_PASSWORD=passwordXXX
-  bridge_app:
+        - MONGO_INITDB_DATABASE=informator
+  informator_app:
     build: .
     ports:
       - "3200:3200"
@@ -16,6 +17,6 @@ services:
       - DB_PASS=passwordXXX
       - DB_HOST=db_info
       - DB_PORT=27017
-      - DB_NAME=admin
+      - DB_NAME=informator
       - JWT_CHECK=true
       - JWT_SECRET_KEY=any secret phrase
