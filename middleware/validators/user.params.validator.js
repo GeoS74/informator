@@ -11,13 +11,13 @@ module.exports.email = async (ctx, next) => {
 };
 
 module.exports.params = async (ctx, next) => {
-  if (!_checkPosition(ctx.request?.body?.position)) {
-    ctx.throw(400, 'invalid position');
+  if (!_checkStatus(ctx.request?.body?.status)) {
+    ctx.throw(400, 'invalid status');
   }
 
   ctx.user = {
     email: ctx.user.email,
-    position: ctx.request?.body?.position || null,
+    status: ctx.request?.body?.status || null,
   };
 
   await next();
@@ -62,7 +62,7 @@ function _checkEmail(email) {
   return !!email;
 }
 
-function _checkPosition() {
+function _checkStatus() {
   return true;
 }
 

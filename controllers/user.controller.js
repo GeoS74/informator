@@ -17,14 +17,14 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const users = await _getAllUsers().populate('roles');
+  const users = await _getAllUsers();
 
   ctx.status = 200;
   ctx.body = users.map((user) => mapper(user));
 };
 
 module.exports.search = async (ctx) => {
-  const users = await _searchUsers(ctx.query?.email || '').populate('roles');
+  const users = await _searchUsers(ctx.query?.email || '');
 
   ctx.status = 200;
   ctx.body = users.map((user) => mapper(user));
@@ -87,11 +87,27 @@ module.exports.photo = async (ctx) => {
 };
 
 function _getUser({ email }) {
-  return User.findOne({ email }).populate('roles');
+  return User.findOne({ email })
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ]
+    });
 }
 
 function _getAllUsers() {
-  return User.find().sort({ _id: 1 }).populate('roles');
+  return User.find().sort({ _id: 1 })
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ]
+    });
 }
 
 function _searchUsers(needle) {
@@ -100,33 +116,56 @@ function _searchUsers(needle) {
       $regex: new RegExp(`${needle}`),
       $options: 'i',
     },
-  }).sort({ _id: 1 }).populate('roles');
+  })
+    .sort({ _id: 1 })
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ]
+    });
 }
 
-function _addUser({ email, position }) {
+function _addUser({ email, status }) {
   return User.create({
     email,
-    position,
+    status,
   });
 }
 
-function _updateUser({ email, position }) {
+function _updateUser({ email, status }) {
   return User.findOneAndUpdate(
     { email },
-    { position },
+    { status },
     {
       new: true,
       runValidators: true, // запускает валидаторы схемы перед записью
     },
   )
-    .populate('roles');
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ]
+    });
 }
 
 function _delUser({ email }) {
   return User.findOneAndDelete(
     { email },
   )
-    .populate('roles');
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ]
+    });
 }
 
 function _updatePhoto(email, photo) {
@@ -137,8 +176,7 @@ function _updatePhoto(email, photo) {
       new: false,
       runValidators: true, // запускает валидаторы схемы перед записью
     },
-  )
-    .populate('roles');
+  );
 }
 
 function _deleteFile(fpath) {

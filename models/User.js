@@ -14,7 +14,7 @@ const Schema = new mongoose.Schema({
     required: 'не заполнено обязательное поле {PATH}',
     unique: 'Не уникальное значение {PATH}',
   },
-  position: String,
+  status: String,
   photo: String,
 }, {
   timestamps: true,
