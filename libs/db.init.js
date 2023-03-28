@@ -16,7 +16,6 @@ const Action = require('../models/Action');
     { title: 'Создать' },
     { title: 'Редактировать' },
     { title: 'Удалить' },
-    { title: 'Утвердить' },
     { title: 'Согласовать' },
     { title: 'Ознакомиться' },
   ])
