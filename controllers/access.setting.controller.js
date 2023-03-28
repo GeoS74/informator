@@ -49,8 +49,13 @@ async function _getAccessSettings() {
 }
 
 async function _saveAccessSettings(roles) {
+  if (!Object.keys(roles).length) {
+    await Role.updateMany({}, { directings: [] });
+    return;
+  }
+
   for (const role in roles) {
-    if ({}.hasOwnProperty.call(roles, role)) {
+    if ({}.hasOwnProperty.call(roles, role)) { // линтер хочет, чтобы ключи были перечисляемыми
       const directings = _getDirectings(roles[role]);
 
       await Role.findByIdAndUpdate(
