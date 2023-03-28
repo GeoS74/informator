@@ -35,7 +35,7 @@ module.exports.taskId = async (ctx, next) => {
 };
 
 module.exports.scanCopy = async (ctx, next) => {
-  _deleteFile(ctx.request.files);
+  _deleteFile(ctx.request.files || {});
 
   await next();
 };

@@ -47,11 +47,15 @@ module.exports.delete = async (ctx) => {
 };
 
 function _getDoc(id) {
-  return Doc.findById(id);
+  return Doc.findById(id)
+    .populate('directing')
+    .populate('task');
 }
 
 function _getDocAll() {
-  return Doc.find().sort({ _id: 1 });
+  return Doc.find().sort({ _id: 1 })
+    .populate('directing')
+    .populate('task');
 }
 
 function _addDoc({
@@ -59,7 +63,10 @@ function _addDoc({
 }) {
   return Doc.create({
     title, directing: directingId, task: taskId, desc: description,
-  });
+  })
+    .then((doc) => Doc.findById(doc._id)
+      .populate('directing')
+      .populate('task'));
 }
 
 function _updateDoc(id, {
@@ -74,11 +81,15 @@ function _updateDoc(id, {
       new: true,
       runValidators: true, // запускает валидаторы схемы перед записью
     },
-  );
+  )
+    .populate('directing')
+    .populate('task');
 }
 
 function _deleteDoc(id) {
-  return Doc.findByIdAndDelete(id);
+  return Doc.findByIdAndDelete(id)
+    .populate('directing')
+    .populate('task');
 }
 
 async function _searchDoc(title) {
@@ -96,5 +107,7 @@ async function _searchDoc(title) {
     .sort({
       _id: -1,
       //  score: { $meta: "textScore" } //сортировка по релевантности
-    });
+    })
+    .populate('directing')
+    .populate('task');
 }

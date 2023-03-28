@@ -14,10 +14,12 @@ const Schema = new mongoose.Schema({
   directing: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Directing,
+    required: 'не заполнено обязательное поле {PATH}',
   },
   task: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Task,
+    required: 'не заполнено обязательное поле {PATH}',
   },
   files: [String],
 }, {
