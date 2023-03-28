@@ -1,7 +1,7 @@
-const connection = require('../connection');
-const logger = require('../logger');
-const config = require('../../config');
-const Action = require('../../models/Action');
+const connection = require('./connection');
+const logger = require('./logger');
+const config = require('../config');
+const Action = require('../models/Action');
 
 (async () => {
   // dropped database
