@@ -10,6 +10,7 @@ const directingRoutes = require('./routes/directing.routes');
 const taskRoutes = require('./routes/task.routes');
 const actionRoutes = require('./routes/action.routes');
 const accessSettingRoutes = require('./routes/access.setting.routes');
+const docFlowRoutes = require('./routes/doc.flow.routes');
 
 const app = new Koa();
 
@@ -26,5 +27,6 @@ app.use(directingRoutes);
 app.use(taskRoutes);
 app.use(actionRoutes);
 app.use(accessSettingRoutes);
+app.use(docFlowRoutes);
 
 module.exports = app;
