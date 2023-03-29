@@ -49,33 +49,44 @@ module.exports.delete = async (ctx) => {
 function _getDoc(id) {
   return Doc.findById(id)
     .populate('directing')
-    .populate('task');
+    .populate('task')
+    .populate('author');
 }
 
 function _getDocAll() {
   return Doc.find().sort({ _id: 1 })
     .populate('directing')
-    .populate('task');
+    .populate('task')
+    .populate('author');
 }
 
 function _addDoc({
-  title, description, directingId, taskId,
+  title, description, directingId, taskId, authorId,
 }) {
   return Doc.create({
-    title, directing: directingId, task: taskId, desc: description,
+    title,
+    desc: description,
+    directing: directingId,
+    task: taskId,
+    author: authorId,
   })
     .then((doc) => Doc.findById(doc._id)
       .populate('directing')
-      .populate('task'));
+      .populate('task')
+      .populate('author'));
 }
 
 function _updateDoc(id, {
-  title, description, directingId, taskId,
+  title, description, directingId, taskId, authorId,
 }) {
   return Doc.findByIdAndUpdate(
     id,
     {
-      title, directing: directingId, task: taskId, desc: description,
+      title,
+      desc: description,
+      directing: directingId,
+      task: taskId,
+      author: authorId,
     },
     {
       new: true,
@@ -83,13 +94,15 @@ function _updateDoc(id, {
     },
   )
     .populate('directing')
-    .populate('task');
+    .populate('task')
+    .populate('author');
 }
 
 function _deleteDoc(id) {
   return Doc.findByIdAndDelete(id)
     .populate('directing')
-    .populate('task');
+    .populate('task')
+    .populate('author');
 }
 
 async function _searchDoc(title) {
@@ -109,5 +122,6 @@ async function _searchDoc(title) {
       //  score: { $meta: "textScore" } //сортировка по релевантности
     })
     .populate('directing')
-    .populate('task');
+    .populate('task')
+    .populate('author');
 }

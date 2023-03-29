@@ -39,6 +39,7 @@ router.post(
   validator.directingId,
   validator.taskId,
   validator.title,
+  validator.authorId,
   validator.scanCopy,
   controller.add,
 );
@@ -46,9 +47,10 @@ router.patch(
   '/:id',
   koaBody(optional),
   validator.objectId,
-  validator.title,
   validator.directingId,
   validator.taskId,
+  validator.title,
+  validator.authorId,
   validator.scanCopy,
   controller.update,
 );

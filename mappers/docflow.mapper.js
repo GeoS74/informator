@@ -10,5 +10,12 @@ module.exports = (data) => ({
     id: data.task._id,
     title: data.task.title,
   },
+  author: {
+    id: data.author._id,
+    title: data.author.email,
+  },
   files: [],
+
+  createdAt: data.createdAt,
+  updatedAt: data.updatedAt,
 });

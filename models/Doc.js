@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const connection = require('../libs/connection');
 const Directing = require('./Directing');
 const Task = require('./Task');
+const User = require('./User');
 
 const Schema = new mongoose.Schema({
   title: {
@@ -19,6 +20,11 @@ const Schema = new mongoose.Schema({
   task: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Task,
+    required: 'не заполнено обязательное поле {PATH}',
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
     required: 'не заполнено обязательное поле {PATH}',
   },
   files: [String],

@@ -34,6 +34,14 @@ module.exports.taskId = async (ctx, next) => {
   await next();
 };
 
+module.exports.authorId = async (ctx, next) => {
+  if (!_checkObjectId(ctx.request?.body?.authorId)) {
+    ctx.throw(400, 'invalid author id');
+  }
+
+  await next();
+};
+
 module.exports.scanCopy = async (ctx, next) => {
   _deleteFile(ctx.request.files || {});
 
