@@ -36,9 +36,9 @@ router.get('/', controller.getAll);
 router.post(
   '/',
   koaBody(optional),
-  validator.title,
   validator.directingId,
   validator.taskId,
+  validator.title,
   validator.scanCopy,
   controller.add,
 );
