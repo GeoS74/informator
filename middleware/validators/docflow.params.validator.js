@@ -34,9 +34,9 @@ module.exports.taskId = async (ctx, next) => {
   await next();
 };
 
-module.exports.authorId = async (ctx, next) => {
-  if (!_checkObjectId(ctx.request?.body?.authorId)) {
-    ctx.throw(400, 'invalid author id');
+module.exports.author = async (ctx, next) => {
+  if (!_checkTitle(ctx.request?.body?.author)) {
+    ctx.throw(400, 'invalid doc author');
   }
 
   await next();

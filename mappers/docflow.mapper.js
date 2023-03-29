@@ -10,10 +10,7 @@ module.exports = (data) => ({
     id: data.task._id,
     title: data.task.title,
   },
-  author: {
-    id: data.author._id,
-    title: data.author.email,
-  },
+  author: data.author,
   files: [],
 
   createdAt: data.createdAt,

@@ -39,7 +39,7 @@ router.post(
   validator.directingId,
   validator.taskId,
   validator.title,
-  validator.authorId,
+  validator.author,
   validator.scanCopy,
   controller.add,
 );
@@ -50,7 +50,7 @@ router.patch(
   validator.directingId,
   validator.taskId,
   validator.title,
-  validator.authorId,
+  validator.author,
   validator.scanCopy,
   controller.update,
 );
