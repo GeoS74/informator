@@ -61,14 +61,14 @@ function _getDocAll() {
 }
 
 function _addDoc({
-  title, description, directingId, taskId, authorId,
+  title, description, directingId, taskId, author,
 }) {
   return Doc.create({
     title,
     desc: description,
     directing: directingId,
     task: taskId,
-    author: authorId,
+    author: author,
   })
     .then((doc) => Doc.findById(doc._id)
       .populate('directing')
@@ -77,7 +77,7 @@ function _addDoc({
 }
 
 function _updateDoc(id, {
-  title, description, directingId, taskId, authorId,
+  title, description, directingId, taskId, author,
 }) {
   return Doc.findByIdAndUpdate(
     id,
@@ -86,7 +86,7 @@ function _updateDoc(id, {
       desc: description,
       directing: directingId,
       task: taskId,
-      author: authorId,
+      author: author,
     },
     {
       new: true,
