@@ -63,6 +63,24 @@ module.exports.delete = async (ctx) => {
   ctx.body = mapper(doc);
 };
 
+module.exports.deleteFile = async (ctx) => {
+  let doc = await _getDoc(ctx.params.id);
+
+  if (!doc) {
+    ctx.throw(404, 'doc not found');
+  }
+
+  /* delete scans */
+  _deleteScans([{ fileName: ctx.request.body.fileName }]);
+
+  const files = doc.files.filter((f) => f.fileName !== ctx.request.body.fileName);
+
+  doc = await _deleteFileToList(doc._id, files);
+
+  ctx.status = 200;
+  ctx.body = mapper(doc);
+};
+
 function _getDoc(id) {
   return Doc.findById(id)
     .populate('directing')
@@ -128,6 +146,17 @@ function _updateDoc(id, {
 
 function _deleteDoc(id) {
   return Doc.findByIdAndDelete(id)
+    .populate('directing')
+    .populate('task')
+    .populate('author');
+}
+
+function _deleteFileToList(id, files) {
+  return Doc.findByIdAndUpdate(
+    id,
+    { files },
+    { new: true },
+  )
     .populate('directing')
     .populate('task')
     .populate('author');

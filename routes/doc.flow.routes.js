@@ -58,6 +58,13 @@ router.patch(
 );
 router.delete('/:id', validator.objectId, controller.delete);
 
+router.patch(
+  '/file/:id',
+  koaBody(optional),
+  validator.objectId,
+  controller.deleteFile,
+);
+
 module.exports.routes = router.routes();
 
 // static files
