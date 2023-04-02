@@ -1,6 +1,8 @@
 const { readdir, mkdir } = require('node:fs/promises');
 const Router = require('koa-router');
 const { koaBody } = require('koa-body');
+const serve = require('koa-static');
+const mount = require('koa-mount');
 
 const controller = require('../controllers/docflow.controller');
 const validator = require('../middleware/validators/docflow.params.validator');
@@ -56,4 +58,7 @@ router.patch(
 );
 router.delete('/:id', validator.objectId, controller.delete);
 
-module.exports = router.routes();
+module.exports.routes = router.routes();
+
+// static files
+module.exports.static = mount('/api/informator/docflow/scan', serve('./files/scan'));

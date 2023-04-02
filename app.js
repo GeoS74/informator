@@ -27,6 +27,7 @@ app.use(directingRoutes);
 app.use(taskRoutes);
 app.use(actionRoutes);
 app.use(accessSettingRoutes);
-app.use(docFlowRoutes);
+app.use(docFlowRoutes.routes);
+app.use(docFlowRoutes.static);
 
 module.exports = app;

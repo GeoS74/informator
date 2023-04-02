@@ -47,6 +47,11 @@ module.exports.update = async (ctx) => {
 module.exports.delete = async (ctx) => {
   const doc = await _deleteDoc(ctx.params.id);
 
+  /* delete scans */
+  if (doc.files) {
+    _deleteScans(doc.files);
+  }
+
   if (!doc) {
     ctx.throw(404, 'doc not found');
   }
@@ -138,6 +143,13 @@ async function _searchDoc(title) {
     .populate('directing')
     .populate('task')
     .populate('author');
+}
+
+function _deleteScans(files) {
+  for (const file of files) {
+    fs.unlink(`./files/scan/${file.fileName}`)
+      .catch((error) => logger.error(error.mesasge));
+  }
 }
 
 function _deleteFile(files) {

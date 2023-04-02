@@ -45,6 +45,7 @@ module.exports.author = async (ctx, next) => {
 module.exports.scanCopy = async (ctx, next) => {
   if (Object.keys(ctx.request.files).indexOf('scans') === -1) {
     _deleteFile(ctx.request.files);
+    ctx.scans = [];
     await next();
     return;
   }
