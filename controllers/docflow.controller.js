@@ -35,6 +35,10 @@ module.exports.add = async (ctx) => {
 };
 
 module.exports.update = async (ctx) => {
+  ctx.request.body.files = await _processingScans(ctx.scans);
+
+  _deleteFile(ctx.scans);
+
   const doc = await _updateDoc(ctx.params.id, ctx.request.body);
 
   if (!doc) {
@@ -96,7 +100,12 @@ function _addDoc({
 }
 
 function _updateDoc(id, {
-  title, description, directingId, taskId, author,
+  title,
+  description,
+  directingId,
+  taskId,
+  author,
+  files,
 }) {
   return Doc.findByIdAndUpdate(
     id,
@@ -106,10 +115,10 @@ function _updateDoc(id, {
       directing: directingId,
       task: taskId,
       author,
+      $push: { files },
     },
     {
       new: true,
-      runValidators: true, // запускает валидаторы схемы перед записью
     },
   )
     .populate('directing')
