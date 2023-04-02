@@ -1,5 +1,8 @@
+const fs = require('fs/promises');
+const sharp = require('sharp');
 const Doc = require('../models/Doc');
 const mapper = require('../mappers/docflow.mapper');
+const logger = require('../libs/logger');
 
 module.exports.get = async (ctx) => {
   const doc = await _getDoc(ctx.params.id);
@@ -21,7 +24,12 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.add = async (ctx) => {
+  ctx.request.body.files = await _processingScans(ctx.scans);
+
+  _deleteFile(ctx.scans);
+
   const doc = await _addDoc(ctx.request.body);
+
   ctx.status = 201;
   ctx.body = mapper(doc);
 };
@@ -61,14 +69,20 @@ function _getDocAll() {
 }
 
 function _addDoc({
-  title, description, directingId, taskId, author,
+  title,
+  description,
+  directingId,
+  taskId,
+  author,
+  files,
 }) {
   return Doc.create({
     title,
     desc: description,
     directing: directingId,
     task: taskId,
-    author: author,
+    author,
+    files,
   })
     .then((doc) => Doc.findById(doc._id)
       .populate('directing')
@@ -86,7 +100,7 @@ function _updateDoc(id, {
       desc: description,
       directing: directingId,
       task: taskId,
-      author: author,
+      author,
     },
     {
       new: true,
@@ -124,4 +138,35 @@ async function _searchDoc(title) {
     .populate('directing')
     .populate('task')
     .populate('author');
+}
+
+function _deleteFile(files) {
+  for (const file of Object.values(files)) {
+    // received more than 1 file in any field with the same name
+    if (Array.isArray(file)) {
+      _deleteFile(file);
+    } else {
+      fs.unlink(file.filepath)
+        .catch((error) => logger.error(error.mesasge));
+    }
+  }
+}
+
+async function _processingScans(scans) {
+  const res = [];
+  for (const scan of scans) {
+    await sharp(scan.filepath)
+      // .resize({
+      //   width: 160,
+      //   height: 160,
+      // })
+      .toFile(`./files/scan/${scan.newFilename}`)
+      .catch((error) => logger.error(`error processing scan: ${error.message}`));
+
+    res.push({
+      originalName: scan.originalFilename,
+      fileName: scan.newFilename,
+    });
+  }
+  return res;
 }

@@ -8,9 +8,9 @@ const accessCheck = require('../middleware/access.check');
 
 (async () => {
   try {
-    await readdir('./files/photo');
+    await readdir('./files/scan');
   } catch (error) {
-    mkdir('./files/photo', {
+    mkdir('./files/scan', {
       recursive: true,
     });
   }

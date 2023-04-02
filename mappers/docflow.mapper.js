@@ -11,7 +11,10 @@ module.exports = (data) => ({
     title: data.task.title,
   },
   author: data.author,
-  files: [],
+  files: data.files.map((f) => ({
+    originalName: f.originalName,
+    fileName: f.fileName,
+  })),
 
   createdAt: data.createdAt,
   updatedAt: data.updatedAt,

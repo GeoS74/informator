@@ -43,10 +43,34 @@ module.exports.author = async (ctx, next) => {
 };
 
 module.exports.scanCopy = async (ctx, next) => {
-  _deleteFile(ctx.request.files || {});
+  if (Object.keys(ctx.request.files).indexOf('scans') === -1) {
+    _deleteFile(ctx.request.files);
+    await next();
+    return;
+  }
+
+  const files = Array.isArray(ctx.request.files.scans)
+    ? ctx.request.files.scans : [ctx.request.files.scans];
+
+  for (const file of files) {
+    if (!_checkMimeType(file.mimetype)) {
+      _deleteFile(ctx.request.files);
+      ctx.throw(400, 'bad mime type');
+      return;
+    }
+  }
+
+  ctx.scans = files;
 
   await next();
 };
+
+function _checkMimeType(mimeType) {
+  if (/^image\/\w+/.test(mimeType)) {
+    return true;
+  }
+  return false;
+}
 
 function _checkObjectId(id) {
   return isValidObjectId(id);

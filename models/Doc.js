@@ -25,7 +25,7 @@ const Schema = new mongoose.Schema({
     type: String,
     required: 'не заполнено обязательное поле {PATH}',
   },
-  files: [String],
+  files: [{ originalName: String, fileName: String }],
 }, {
   timestamps: true,
 });
