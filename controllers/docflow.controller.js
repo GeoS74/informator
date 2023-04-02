@@ -205,13 +205,17 @@ function _deleteFile(files) {
 async function _processingScans(scans) {
   const res = [];
   for (const scan of scans) {
-    await sharp(scan.filepath)
-      // .resize({
-      //   width: 160,
-      //   height: 160,
-      // })
-      .toFile(`./files/scan/${scan.newFilename}`)
-      .catch((error) => logger.error(`error processing scan: ${error.message}`));
+    // console.log(scan.filepath)
+    // console.log(`./files/scan/${scan.newFilename}`)
+    await fs.rename(scan.filepath, scan.filepath);
+    // .catch(console.log)
+    // await sharp(scan.filepath)
+    //   // .resize({
+    //   //   width: 160,
+    //   //   height: 160,
+    //   // })
+    //   .toFile(`./files/scan/${scan.newFilename}`)
+    //   .catch((error) => logger.error(`error processing scan: ${error.message}`));
 
     res.push({
       originalName: scan.originalFilename,
