@@ -1,5 +1,5 @@
 const fs = require('fs/promises');
-const sharp = require('sharp');
+const path = require('path');
 const Doc = require('../models/Doc');
 const mapper = require('../mappers/docflow.mapper');
 const logger = require('../libs/logger');
@@ -26,8 +26,6 @@ module.exports.getAll = async (ctx) => {
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
 
-  _deleteFile(ctx.scans);
-
   const doc = await _addDoc(ctx.request.body);
 
   ctx.status = 201;
@@ -36,8 +34,6 @@ module.exports.add = async (ctx) => {
 
 module.exports.update = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
-
-  _deleteFile(ctx.scans);
 
   const doc = await _updateDoc(ctx.params.id, ctx.request.body);
 
@@ -51,31 +47,33 @@ module.exports.update = async (ctx) => {
 module.exports.delete = async (ctx) => {
   const doc = await _deleteDoc(ctx.params.id);
 
+  if (!doc) {
+    ctx.throw(404, 'doc not found');
+  }
+
   /* delete scans */
   if (doc.files) {
     _deleteScans(doc.files);
   }
 
-  if (!doc) {
-    ctx.throw(404, 'doc not found');
-  }
   ctx.status = 200;
   ctx.body = mapper(doc);
 };
 
-module.exports.deleteFile = async (ctx) => {
+// удаление прикрепленного файла при редактировании документа
+module.exports.deleteAtatchedFile = async (ctx) => {
   let doc = await _getDoc(ctx.params.id);
 
   if (!doc) {
     ctx.throw(404, 'doc not found');
   }
 
+  /* delete filename from array of attached files */
+  const files = doc.files.filter((f) => f.fileName !== ctx.request.body.fileName);
+  doc = await _updateAttachedFileList(doc._id, files);
+
   /* delete scans */
   _deleteScans([{ fileName: ctx.request.body.fileName }]);
-
-  const files = doc.files.filter((f) => f.fileName !== ctx.request.body.fileName);
-
-  doc = await _deleteFileToList(doc._id, files);
 
   ctx.status = 200;
   ctx.body = mapper(doc);
@@ -151,7 +149,7 @@ function _deleteDoc(id) {
     .populate('author');
 }
 
-function _deleteFileToList(id, files) {
+function _updateAttachedFileList(id, files) {
   return Doc.findByIdAndUpdate(
     id,
     { files },
@@ -190,32 +188,11 @@ function _deleteScans(files) {
   }
 }
 
-function _deleteFile(files) {
-  for (const file of Object.values(files)) {
-    // received more than 1 file in any field with the same name
-    if (Array.isArray(file)) {
-      _deleteFile(file);
-    } else {
-      fs.unlink(file.filepath)
-        .catch((error) => logger.error(error.mesasge));
-    }
-  }
-}
-
 async function _processingScans(scans) {
   const res = [];
   for (const scan of scans) {
-    // console.log(scan.filepath)
-    // console.log(`./files/scan/${scan.newFilename}`)
-    await fs.rename(scan.filepath, scan.filepath);
-    // .catch(console.log)
-    // await sharp(scan.filepath)
-    //   // .resize({
-    //   //   width: 160,
-    //   //   height: 160,
-    //   // })
-    //   .toFile(`./files/scan/${scan.newFilename}`)
-    //   .catch((error) => logger.error(`error processing scan: ${error.message}`));
+    await fs.rename(scan.filepath, path.join(__dirname, `../files/scan/${scan.newFilename}`))
+      .catch((error) => logger.error(error.mesasge));
 
     res.push({
       originalName: scan.originalFilename,

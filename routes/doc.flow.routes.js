@@ -62,7 +62,7 @@ router.patch(
   '/file/:id',
   koaBody(optional),
   validator.objectId,
-  controller.deleteFile,
+  controller.deleteAtatchedFile,
 );
 
 module.exports.routes = router.routes();
