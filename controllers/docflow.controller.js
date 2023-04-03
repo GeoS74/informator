@@ -74,8 +74,8 @@ module.exports.deleteAtatchedFile = async (ctx) => {
   }
 
   /* delete filename from array of attached files */
-  const files = doc.files.filter((f) => f.fileName !== ctx.request.body.fileName);
-  doc = await _updateAttachedFileList(doc._id, files);
+  // const files = doc.files.filter((f) => f.fileName !== ctx.request.body.fileName);
+  doc = await _updateAttachedFileList(doc._id, { fileName: ctx.request.body.fileName });
 
   /* delete scans */
   _deleteScans([{ fileName: ctx.request.body.fileName }]);
@@ -157,7 +157,7 @@ function _deleteDoc(id) {
 function _updateAttachedFileList(id, files) {
   return Doc.findByIdAndUpdate(
     id,
-    { files },
+    { $pull: { files } },
     { new: true },
   )
     .populate('directing')
