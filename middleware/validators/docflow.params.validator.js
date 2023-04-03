@@ -70,6 +70,15 @@ function _checkMimeType(mimeType) {
   if (/^image\/\w+/.test(mimeType)) {
     return true;
   }
+  if (/^application\/pdf/.test(mimeType)) {
+    return true;
+  }
+  if (/^application\/vnd\.\w+/.test(mimeType)) {
+    return true;
+  }
+  if (/^application\/msword/.test(mimeType)) {
+    return true;
+  }
   return false;
 }
 
