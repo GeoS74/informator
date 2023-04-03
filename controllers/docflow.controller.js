@@ -15,9 +15,14 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const docs = ctx.query?.title
-    ? await _searchDoc(ctx.query.title)
-    : await _getDocAll();
+  const docs = await _getDocAll();
+
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
+
+module.exports.search = async (ctx) => {
+  const docs = await _searchDoc(ctx.query?.title, ctx.query?.last);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
@@ -160,13 +165,17 @@ function _updateAttachedFileList(id, files) {
     .populate('author');
 }
 
-async function _searchDoc(title) {
+async function _searchDoc(title, lastId) {
   const filter = {
     $text: {
       $search: title,
       $language: 'russian',
     },
   };
+
+  if (lastId) {
+    filter._id = { $lt: lastId };
+  }
 
   const projection = {
     score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
@@ -176,6 +185,7 @@ async function _searchDoc(title) {
       _id: -1,
       //  score: { $meta: "textScore" } //сортировка по релевантности
     })
+    .limit(20)
     .populate('directing')
     .populate('task')
     .populate('author');

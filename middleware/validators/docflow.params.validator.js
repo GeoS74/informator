@@ -66,6 +66,16 @@ module.exports.scanCopy = async (ctx, next) => {
   await next();
 };
 
+module.exports.lastId = async (ctx, next) => {
+  if (ctx.query.last) {
+    if (!_checkObjectId(ctx.query.last)) {
+      ctx.throw(400, 'invalid last id');
+    }
+  }
+
+  await next();
+};
+
 function _checkMimeType(mimeType) {
   if (/^image\/\w+/.test(mimeType)) {
     return true;
