@@ -77,12 +77,7 @@ module.exports.lastId = async (ctx, next) => {
 };
 
 module.exports.limit = async (ctx, next) => {
-  if (ctx.query.limit) {
-    if (!_checkObjectId(ctx.query.limit)) {
-      ctx.throw(400, 'invalid last id');
-    }
-    ctx.query.limit = parseInt(ctx.query.limit, 10) || 25;
-  }
+  ctx.query.limit = parseInt(ctx.query.limit, 10) || 25;
 
   await next();
 };

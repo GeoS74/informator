@@ -22,7 +22,7 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.search = async (ctx) => {
-  const docs = await _searchDoc(ctx.query?.title, ctx.query?.last, ctx.query?.limit);
+  const docs = await _searchDoc(ctx.query.title, ctx.query.last, ctx.query.limit);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
