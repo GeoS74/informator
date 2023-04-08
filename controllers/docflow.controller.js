@@ -15,14 +15,14 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const docs = await _getDocAll();
+  const docs = await _getDocAll(ctx.query.limit);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
 module.exports.search = async (ctx) => {
-  const docs = await _searchDoc(ctx.query?.title, ctx.query?.last);
+  const docs = await _searchDoc(ctx.query?.title, ctx.query?.last, ctx.query?.limit);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
@@ -91,8 +91,10 @@ function _getDoc(id) {
     .populate('author');
 }
 
-function _getDocAll() {
-  return Doc.find().sort({ _id: 1 })
+function _getDocAll(limit) {
+  return Doc.find()
+    .sort({ _id: 1 })
+    .limit(limit)
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -165,7 +167,7 @@ function _updateAttachedFileList(id, files) {
     .populate('author');
 }
 
-async function _searchDoc(title, lastId) {
+async function _searchDoc(title, lastId, limit) {
   const filter = {
     $text: {
       $search: title,
@@ -185,7 +187,7 @@ async function _searchDoc(title, lastId) {
       _id: -1,
       //  score: { $meta: "textScore" } //сортировка по релевантности
     })
-    .limit(20)
+    .limit(limit)
     .populate('directing')
     .populate('task')
     .populate('author');

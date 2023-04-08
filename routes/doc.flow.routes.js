@@ -34,8 +34,8 @@ const router = new Router({ prefix: '/api/informator/docflow' });
 
 router.use(accessCheck);
 router.get('/:id', validator.objectId, controller.get);
-router.get('/', controller.getAll);
-router.get('/search/doc', validator.lastId, controller.search);
+router.get('/', validator.limit, controller.getAll);
+router.get('/search/doc', validator.lastId, validator.limit, controller.search);
 router.post(
   '/',
   koaBody(optional),
