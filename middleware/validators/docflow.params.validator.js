@@ -4,6 +4,7 @@ const logger = require('../../libs/logger');
 
 module.exports.title = async (ctx, next) => {
   if (!_checkTitle(ctx.request?.body?.title)) {
+    _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid title');
   }
 
@@ -12,6 +13,7 @@ module.exports.title = async (ctx, next) => {
 
 module.exports.objectId = async (ctx, next) => {
   if (!_checkObjectId(ctx.params.id)) {
+    _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid doc id');
   }
 
@@ -20,6 +22,7 @@ module.exports.objectId = async (ctx, next) => {
 
 module.exports.directingId = async (ctx, next) => {
   if (!_checkObjectId(ctx.request?.body?.directingId)) {
+    _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid directing id');
   }
 
@@ -28,6 +31,7 @@ module.exports.directingId = async (ctx, next) => {
 
 module.exports.taskId = async (ctx, next) => {
   if (!_checkObjectId(ctx.request?.body?.taskId)) {
+    _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid task id');
   }
 
@@ -36,6 +40,7 @@ module.exports.taskId = async (ctx, next) => {
 
 module.exports.author = async (ctx, next) => {
   if (!_checkTitle(ctx.request?.body?.author)) {
+    _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid doc author');
   }
 
