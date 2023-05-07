@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const connection = require('../libs/connection');
 const Directing = require('./Directing');
 const Task = require('./Task');
+const User = require('./User');
 
 const Schema = new mongoose.Schema({
   num: Number, // идентификатор в рамках документов одного типа и направления
@@ -23,7 +24,8 @@ const Schema = new mongoose.Schema({
     required: 'не заполнено обязательное поле {PATH}',
   },
   author: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
     required: 'не заполнено обязательное поле {PATH}',
   },
   files: [{ originalName: String, fileName: String }],
@@ -42,16 +44,16 @@ Schema.index(
 );
 
 // генерация идентификатора в рамках документов одного типа и направления
-Schema.pre('save', async function(next) {
+Schema.pre('save', async function _(next) {
   const lastDoc = await module.exports.findOne({
     directing: this.directing,
     task: this.task,
   })
-  .sort({_id: -1});
+    .sort({ _id: -1 });
 
   this.num = (lastDoc?.num || 0) + 1;
 
-  next()
+  next();
 });
 
 module.exports = connection.model('Doc', Schema);

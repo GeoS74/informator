@@ -1,5 +1,6 @@
 module.exports = (data) => ({
   id: data.id,
+  num: data.num,
   title: data.title,
   description: data.desc,
   directing: {
@@ -10,7 +11,10 @@ module.exports = (data) => ({
     id: data.task._id,
     title: data.task.title,
   },
-  author: data.author,
+  author: {
+    uid: data.author._id,
+    fullName: data.author.fullName,
+  },
   files: data.files.map((f) => ({
     originalName: f.originalName,
     fileName: f.fileName,

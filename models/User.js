@@ -34,7 +34,7 @@ function setFullName() {
 }
 
 function getFullName() {
-  if (this.email) {
+  if (this.email && this.name) {
     return `${this.name || ''} ${this.email}`;
   }
   return undefined;
