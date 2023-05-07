@@ -4,6 +4,7 @@ const Directing = require('./Directing');
 const Task = require('./Task');
 
 const Schema = new mongoose.Schema({
+  num: Number, // идентификатор в рамках документов одного типа и направления
   title: {
     type: String,
     required: 'не заполнено обязательное поле {PATH}',
@@ -39,5 +40,18 @@ Schema.index(
     default_language: 'russian',
   },
 );
+
+// генерация идентификатора в рамках документов одного типа и направления
+Schema.pre('save', async function(next) {
+  const lastDoc = await module.exports.findOne({
+    directing: this.directing,
+    task: this.task,
+  })
+  .sort({_id: -1});
+
+  this.num = (lastDoc?.num || 0) + 1;
+
+  next()
+});
 
 module.exports = connection.model('Doc', Schema);
