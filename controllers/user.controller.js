@@ -112,7 +112,7 @@ function _getAllUsers() {
 
 function _searchUsers(needle) {
   return User.find({
-    email: {
+    fullName: {
       $regex: new RegExp(`${needle}`),
       $options: 'i',
     },
