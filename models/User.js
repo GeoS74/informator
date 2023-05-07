@@ -23,6 +23,9 @@ const Schema = new mongoose.Schema({
   toObject: { virtuals: true },
 });
 
+/**
+ * создание и обновление поля fullName пользователя
+ */
 Schema.pre('save', setFullName);
 Schema.pre('findOneAndUpdate', updateFullName);
 
