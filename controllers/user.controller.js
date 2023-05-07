@@ -128,17 +128,17 @@ function _searchUsers(needle) {
     });
 }
 
-function _addUser({ email, status }) {
+function _addUser({ email, name }) {
   return User.create({
     email,
-    status,
+    name,
   });
 }
 
-function _updateUser({ email, status }) {
+function _updateUser({ email, name }) {
   return User.findOneAndUpdate(
     { email },
-    { status },
+    { name },
     {
       new: true,
       runValidators: true, // запускает валидаторы схемы перед записью

@@ -14,12 +14,37 @@ const Schema = new mongoose.Schema({
     required: 'не заполнено обязательное поле {PATH}',
     unique: 'Не уникальное значение {PATH}',
   },
-  status: String,
+  name: String,
   photo: String,
+  fullName: String,
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true },
 });
+
+Schema.pre('save', setFullName);
+Schema.pre('findOneAndUpdate', updateFullName);
+
+function setFullName() {
+  this.fullName = getFullName.call(this);
+}
+
+function getFullName() {
+  if (this.email) {
+    return `${this.name || ''} ${this.email}`;
+  }
+  return undefined;
+}
+
+function updateFullName() {
+  const email = this.getFilter()?.email;
+  const name = this.getUpdate()?.name;
+
+  this.setUpdate({
+    fullName: getFullName.call({ email, name }),
+    ...this.getUpdate(),
+  });
+}
 
 module.exports = connection.model('User', Schema);

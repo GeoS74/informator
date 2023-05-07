@@ -1,7 +1,8 @@
 module.exports = (data) => ({
   email: data.email,
-  status: data.status || null,
-  photo: data.photo || null,
+  photo: data.photo || '',
+  name: data.name || '',
+  fullName: data.fullName || '',
 
   roles: data.roles.map((role) => ({
     id: role.id,
