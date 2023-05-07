@@ -13,6 +13,8 @@ module.exports = (data) => ({
   },
   author: {
     uid: data.author._id,
+    email: data.author.email,
+    name: data.author.name,
     fullName: data.author.fullName,
   },
   files: data.files.map((f) => ({
