@@ -21,6 +21,20 @@ module.exports = (data) => ({
     originalName: f.originalName,
     fileName: f.fileName,
   })),
+  acceptor: data.acceptor.map((e) => ({
+    uid: e.user._id,
+    email: e.user.email,
+    name: e.user.name,
+    fullName: e.user.fullName,
+    accept: e.accept,
+  })),
+  recipient: data.recipient.map((e) => ({
+    uid: e.user._id,
+    email: e.user.email,
+    name: e.user.name,
+    fullName: e.user.fullName,
+    accept: e.accept,
+  })),
 
   createdAt: data.createdAt,
   updatedAt: data.updatedAt,

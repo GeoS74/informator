@@ -4,8 +4,18 @@ const Directing = require('./Directing');
 const Task = require('./Task');
 const User = require('./User');
 
+const Signatory = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User,
+  },
+  accept: Boolean,
+});
+
 const Schema = new mongoose.Schema({
   num: Number, // идентификатор в рамках документов одного типа и направления
+  acceptor: [Signatory],
+  recipient: [Signatory],
   title: {
     type: String,
     required: 'не заполнено обязательное поле {PATH}',

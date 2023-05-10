@@ -86,6 +86,8 @@ module.exports.deleteAtatchedFile = async (ctx) => {
 
 function _getDoc(id) {
   return Doc.findById(id)
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -95,6 +97,8 @@ function _getDocAll(limit) {
   return Doc.find()
     .sort({ _id: 1 })
     .limit(limit)
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -107,6 +111,8 @@ function _addDoc({
   taskId,
   author,
   files,
+  acceptor,
+  recipient,
 }) {
   return Doc.create({
     title,
@@ -115,8 +121,12 @@ function _addDoc({
     task: taskId,
     author,
     files,
+    acceptor,
+    recipient,
   })
     .then((doc) => Doc.findById(doc._id)
+      .populate('acceptor.user')
+      .populate('recipient.user')
       .populate('directing')
       .populate('task')
       .populate('author'));
@@ -129,6 +139,8 @@ function _updateDoc(id, {
   taskId,
   author,
   files,
+  acceptor,
+  recipient,
 }) {
   return Doc.findByIdAndUpdate(
     id,
@@ -139,11 +151,15 @@ function _updateDoc(id, {
       task: taskId,
       author,
       $push: { files },
+      acceptor,
+      recipient,
     },
     {
       new: true,
     },
   )
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -151,6 +167,8 @@ function _updateDoc(id, {
 
 function _deleteDoc(id) {
   return Doc.findByIdAndDelete(id)
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -162,6 +180,8 @@ function _updateAttachedFileList(id, files) {
     { $pull: { files } },
     { new: true },
   )
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');
@@ -188,6 +208,8 @@ async function _searchDoc(title, lastId, limit) {
       //  score: { $meta: "textScore" } //сортировка по релевантности
     })
     .limit(limit)
+    .populate('acceptor.user')
+    .populate('recipient.user')
     .populate('directing')
     .populate('task')
     .populate('author');

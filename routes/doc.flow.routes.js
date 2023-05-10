@@ -43,6 +43,8 @@ router.post(
   validator.taskId,
   validator.title,
   validator.author,
+  validator.acceptor,
+  validator.recipient,
   validator.scanCopy,
   controller.add,
 );
@@ -54,6 +56,8 @@ router.patch(
   validator.taskId,
   validator.title,
   validator.author,
+  validator.acceptor,
+  validator.recipient,
   validator.scanCopy,
   controller.update,
 );

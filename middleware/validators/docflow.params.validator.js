@@ -39,7 +39,7 @@ module.exports.taskId = async (ctx, next) => {
 };
 
 module.exports.author = async (ctx, next) => {
-  if (!_checkTitle(ctx.request?.body?.author)) {
+  if (!_checkObjectId(ctx.request?.body?.author)) {
     _deleteFile(ctx.request.files);
     ctx.throw(400, 'invalid doc author');
   }
@@ -83,6 +83,48 @@ module.exports.lastId = async (ctx, next) => {
 
 module.exports.limit = async (ctx, next) => {
   ctx.query.limit = parseInt(ctx.query.limit, 10) || 25;
+
+  await next();
+};
+
+module.exports.acceptor = async (ctx, next) => {
+  const acceptor = [];
+
+  for (const uid in ctx.request?.body?.acceptor) {
+    if ({}.hasOwnProperty.call(ctx.request.body.acceptor, uid)) {
+      if (!_checkObjectId(uid)) {
+        _deleteFile(ctx.request.files);
+        ctx.throw(400, 'invalid acceptor uid');
+      }
+      acceptor.push({
+        user: uid,
+        accept: !!ctx.request.body.acceptor[uid],
+      });
+    }
+  }
+
+  ctx.request.body.acceptor = acceptor;
+
+  await next();
+};
+
+module.exports.recipient = async (ctx, next) => {
+  const recipient = [];
+
+  for (const uid in ctx.request?.body?.recipient) {
+    if ({}.hasOwnProperty.call(ctx.request.body.acceptor, uid)) {
+      if (!_checkObjectId(uid)) {
+        _deleteFile(ctx.request.files);
+        ctx.throw(400, 'invalid recipient uid');
+      }
+      recipient.push({
+        user: uid,
+        accept: !!ctx.request.body.recipient[uid],
+      });
+    }
+  }
+
+  ctx.request.body.recipient = recipient;
 
   await next();
 };
