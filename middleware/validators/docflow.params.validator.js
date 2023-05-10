@@ -112,7 +112,7 @@ module.exports.recipient = async (ctx, next) => {
   const recipient = [];
 
   for (const uid in ctx.request?.body?.recipient) {
-    if ({}.hasOwnProperty.call(ctx.request.body.acceptor, uid)) {
+    if ({}.hasOwnProperty.call(ctx.request.body.recipient, uid)) {
       if (!_checkObjectId(uid)) {
         _deleteFile(ctx.request.files);
         ctx.throw(400, 'invalid recipient uid');
