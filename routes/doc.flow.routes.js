@@ -33,11 +33,37 @@ const optional = {
 const router = new Router({ prefix: '/api/informator/docflow' });
 
 router.use(accessCheck);
+router.get('/search/doc/title',
+  validator.query,
+  validator.lastId,
+  validator.limit,
+  controller.searchByTitle,
+);
+router.get('/search/doc/acceptor/:id',
+  validator.query,
+  validator.objectId,
+  validator.lastId,
+  validator.limit,
+  controller.searchByAcceptor,
+);
+router.get('/search/doc/recipient/:id',
+  validator.query,
+  validator.objectId,
+  validator.lastId,
+  validator.limit,
+  controller.searchByRecipient,
+);
+router.get('/search/doc/author/:id',
+  validator.query,
+  validator.objectId,
+  validator.lastId,
+  validator.limit,
+  controller.searchByAuthor,
+);
+
 router.get('/:id', validator.objectId, controller.get);
 router.get('/', validator.limit, controller.getAll);
-router.get('/search/doc', validator.lastId, validator.limit, controller.search);
-router.post(
-  '/',
+router.post('/',
   koaBody(optional),
   validator.directingId,
   validator.taskId,
@@ -48,8 +74,7 @@ router.post(
   validator.scanCopy,
   controller.add,
 );
-router.patch(
-  '/:id',
+router.patch('/:id',
   koaBody(optional),
   validator.objectId,
   validator.directingId,
@@ -63,8 +88,7 @@ router.patch(
 );
 router.delete('/:id', validator.objectId, controller.delete);
 
-router.patch(
-  '/file/:id',
+router.patch('/file/:id',
   koaBody(optional),
   validator.objectId,
   controller.deleteAtatchedFile,

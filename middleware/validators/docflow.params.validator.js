@@ -2,6 +2,12 @@ const fs = require('fs/promises');
 const { isValidObjectId } = require('mongoose');
 const logger = require('../../libs/logger');
 
+module.exports.query = async (ctx, next) => {
+  ctx.query.query = ctx.query.query || '';
+
+  await next();
+};
+
 module.exports.title = async (ctx, next) => {
   if (!_checkTitle(ctx.request?.body?.title)) {
     _deleteFile(ctx.request.files);
@@ -77,6 +83,8 @@ module.exports.lastId = async (ctx, next) => {
       ctx.throw(400, 'invalid last id');
     }
   }
+
+  ctx.query.lastId = ctx.query.last;
 
   await next();
 };

@@ -21,12 +21,64 @@ module.exports.getAll = async (ctx) => {
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
-module.exports.search = async (ctx) => {
-  const docs = await _searchDoc(ctx.query.title, ctx.query.last, ctx.query.limit);
+
+
+async function _searchDoc({query, lastId, limit}) {
+  const filter = {
+    $text: {
+      $search: query,
+      $language: 'russian',
+    },
+  };
+
+  if (lastId) {
+    filter._id = { $lt: lastId };
+  }
+
+  const projection = {
+    score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
+  };
+  return Doc.find(filter, projection)
+    .sort({
+      _id: -1,
+      //  score: { $meta: "textScore" } //сортировка по релевантности
+    })
+    .limit(limit)
+    .populate('acceptor.user')
+    .populate('recipient.user')
+    .populate('directing')
+    .populate('task')
+    .populate('author');
+}
+
+
+module.exports.searchByTitle = async (ctx) => {
+  const docs = await _searchDoc(ctx.query);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
+
+// module.exports.searchByAcceptor = async (ctx) => {
+//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+
+//   ctx.status = 200;
+//   ctx.body = docs.map((doc) => (mapper(doc)));
+// };
+
+// module.exports.searchByRecipient = async (ctx) => {
+//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+
+//   ctx.status = 200;
+//   ctx.body = docs.map((doc) => (mapper(doc)));
+// };
+
+// module.exports.searchByAuthor = async (ctx) => {
+//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+
+//   ctx.status = 200;
+//   ctx.body = docs.map((doc) => (mapper(doc)));
+// };
 
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
@@ -187,7 +239,7 @@ function _updateAttachedFileList(id, files) {
     .populate('author');
 }
 
-async function _searchDoc(title, lastId, limit) {
+async function _searchDocByTitle(title, lastId, limit) {
   const filter = {
     $text: {
       $search: title,
