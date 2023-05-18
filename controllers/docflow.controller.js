@@ -23,13 +23,26 @@ module.exports.getAll = async (ctx) => {
 
 
 
-async function _searchDoc({query, lastId, limit}) {
+async function _searchDoc({ query, lastId, limit, acceptor, recipient, author }) {
   const filter = {
     $text: {
       $search: query,
       $language: 'russian',
     },
   };
+
+  if (acceptor) {
+    // можно так: filter.acceptor = { user: id }
+    filter.acceptor = { $elemMatch: { user: acceptor } }
+  }
+
+  if (recipient) {
+    filter.recipient = { user: recipient }
+  }
+
+  if (author) {
+    filter.author = author
+  }
 
   if (lastId) {
     filter._id = { $lt: lastId };
@@ -51,34 +64,44 @@ async function _searchDoc({query, lastId, limit}) {
     .populate('author');
 }
 
-
 module.exports.searchByTitle = async (ctx) => {
-  const docs = await _searchDoc(ctx.query);
+  const docs = await _searchDoc({ 
+    ...ctx.query,
+   });
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
-// module.exports.searchByAcceptor = async (ctx) => {
-//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+module.exports.searchByAcceptor = async (ctx) => {
+  const docs = await _searchDoc({ 
+    acceptor: ctx.params.id || null,
+    ...ctx.query,
+   });
 
-//   ctx.status = 200;
-//   ctx.body = docs.map((doc) => (mapper(doc)));
-// };
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
 
-// module.exports.searchByRecipient = async (ctx) => {
-//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+module.exports.searchByRecipient = async (ctx) => {
+  const docs = await _searchDoc({ 
+    recipient: ctx.params.id || null,
+    ...ctx.query,
+   });
 
-//   ctx.status = 200;
-//   ctx.body = docs.map((doc) => (mapper(doc)));
-// };
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
 
-// module.exports.searchByAuthor = async (ctx) => {
-//   const docs = await _searchDocByTitle(ctx.query.title || '', ctx.query.lastId, ctx.query.limit);
+module.exports.searchByAuthor = async (ctx) => {
+  const docs = await _searchDoc({ 
+    author: ctx.params.id || null,
+    ...ctx.query,
+   });
 
-//   ctx.status = 200;
-//   ctx.body = docs.map((doc) => (mapper(doc)));
-// };
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
 
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
