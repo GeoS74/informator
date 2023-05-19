@@ -21,97 +21,6 @@ module.exports.getAll = async (ctx) => {
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
-
-
-
-
-module.exports.search = async (ctx) => {
-  const docs = await _searchDoc(_makeFilterData(ctx.query));
-
-  ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
-};
-
-module.exports.searchCount = async (ctx) => {
-  const count = await _searchDocCount(_makeFilterData(ctx.query));
-
-  ctx.status = 200;
-  ctx.body = { count };
-};
-
-async function _searchDoc(data) {
-  return Doc.find(data.filter, data.projection)
-    .sort({
-      _id: -1,
-      //  score: { $meta: "textScore" } //сортировка по релевантности
-    })
-    .limit(data.limit)
-    .populate('acceptor.user')
-    .populate('recipient.user')
-    .populate('directing')
-    .populate('task')
-    .populate('author');
-}
-
-async function _searchDocCount(data) {
-  return Doc.find(data.filter, data.projection)
-    .sort({
-      _id: -1,
-    })
-    .count()
-}
-
-function _makeFilterData({ query, lastId, limit, user, acceptor, recipient, author, directing, tasc }) {
-  const filter = {};
-  const projection = {};
-
-  if (directing) {
-    filter.directing = directing
-  }
-
-  if (tasc) {
-    filter.tasc = tasc
-  }
-
-  if (query) {
-    filter.$text = {
-      $search: query,
-      $language: 'russian',
-    }
-
-    projection.score = { $meta: 'textScore' } // добавить в данные оценку текстового поиска (релевантность)
-  }
-
-  if (user) {
-    if (acceptor === '1') {
-      filter.acceptor = { $elemMatch: { user: user } }
-    }
-
-    if (recipient === '1') {
-      filter.recipient = { user: user }
-    }
-
-    if (author === '1') {
-      filter.author = user
-    }
-  }
-
-  if (lastId) {
-    filter._id = { $lt: lastId };
-  }
-
-  return { filter, projection, limit }
-}
-
-
-
-
-
-
-
-
-
-
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
 
@@ -271,34 +180,6 @@ function _updateAttachedFileList(id, files) {
     .populate('author');
 }
 
-async function _searchDocByTitle(title, lastId, limit) {
-  const filter = {
-    $text: {
-      $search: title,
-      $language: 'russian',
-    },
-  };
-
-  if (lastId) {
-    filter._id = { $lt: lastId };
-  }
-
-  const projection = {
-    score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
-  };
-  return Doc.find(filter, projection)
-    .sort({
-      _id: -1,
-      //  score: { $meta: "textScore" } //сортировка по релевантности
-    })
-    .limit(limit)
-    .populate('acceptor.user')
-    .populate('recipient.user')
-    .populate('directing')
-    .populate('task')
-    .populate('author');
-}
-
 function _deleteScans(files) {
   for (const file of files) {
     fs.unlink(`./files/scan/${file.fileName}`)
@@ -318,4 +199,86 @@ async function _processingScans(scans) {
     });
   }
   return res;
+}
+
+/** search docs */
+
+module.exports.search = async (ctx) => {
+  const docs = await _searchDoc(_makeFilterData(ctx.query));
+
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
+
+module.exports.searchCount = async (ctx) => {
+  const count = await _searchDocCount(_makeFilterData(ctx.query));
+
+  ctx.status = 200;
+  ctx.body = { count };
+};
+
+async function _searchDoc(data) {
+  return Doc.find(data.filter, data.projection)
+    .sort({
+      _id: -1,
+      //  score: { $meta: "textScore" } //сортировка по релевантности
+    })
+    .limit(data.limit)
+    .populate('acceptor.user')
+    .populate('recipient.user')
+    .populate('directing')
+    .populate('task')
+    .populate('author');
+}
+
+async function _searchDocCount(data) {
+  return Doc.find(data.filter, data.projection)
+    .sort({
+      _id: -1,
+    })
+    .count();
+}
+
+function _makeFilterData({
+  query, lastId, limit, user, acceptor, recipient, author, directing, tasc,
+}) {
+  const filter = {};
+  const projection = {};
+
+  if (directing) {
+    filter.directing = directing;
+  }
+
+  if (tasc) {
+    filter.tasc = tasc;
+  }
+
+  if (query) {
+    filter.$text = {
+      $search: query,
+      $language: 'russian',
+    };
+
+    projection.score = { $meta: 'textScore' }; // добавить в данные оценку текстового поиска (релевантность)
+  }
+
+  if (user) {
+    if (acceptor === '1') {
+      filter.acceptor = { $elemMatch: { user } };
+    }
+
+    if (recipient === '1') {
+      filter.recipient = { $elemMatch: { user } };
+    }
+
+    if (author === '1') {
+      filter.author = user;
+    }
+  }
+
+  if (lastId) {
+    filter._id = { $lt: lastId };
+  }
+
+  return { filter, projection, limit };
 }
