@@ -33,32 +33,19 @@ const optional = {
 const router = new Router({ prefix: '/api/informator/docflow' });
 
 router.use(accessCheck);
-router.get('/search/doc/title',
+
+router.get('/search/doc/',
   validator.query,
   validator.lastId,
   validator.limit,
-  controller.searchByTitle,
+  controller.search,
 );
-router.get('/search/doc/acceptor/:id',
+
+router.get('/search/doc/count',
   validator.query,
-  validator.objectId,
   validator.lastId,
   validator.limit,
-  controller.searchByAcceptor,
-);
-router.get('/search/doc/recipient/:id',
-  validator.query,
-  validator.objectId,
-  validator.lastId,
-  validator.limit,
-  controller.searchByRecipient,
-);
-router.get('/search/doc/author/:id',
-  validator.query,
-  validator.objectId,
-  validator.lastId,
-  validator.limit,
-  controller.searchByAuthor,
+  controller.searchCount,
 );
 
 router.get('/:id', validator.objectId, controller.get);

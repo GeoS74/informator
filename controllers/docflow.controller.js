@@ -23,40 +23,29 @@ module.exports.getAll = async (ctx) => {
 
 
 
-async function _searchDoc({ query, lastId, limit, acceptor, recipient, author }) {
-  const filter = {
-    $text: {
-      $search: query,
-      $language: 'russian',
-    },
-  };
 
-  if (acceptor) {
-    // можно так: filter.acceptor = { user: id }
-    filter.acceptor = { $elemMatch: { user: acceptor } }
-  }
 
-  if (recipient) {
-    filter.recipient = { user: recipient }
-  }
+module.exports.search = async (ctx) => {
+  const docs = await _searchDoc(_makeFilterData(ctx.query));
 
-  if (author) {
-    filter.author = author
-  }
+  ctx.status = 200;
+  ctx.body = docs.map((doc) => (mapper(doc)));
+};
 
-  if (lastId) {
-    filter._id = { $lt: lastId };
-  }
+module.exports.searchCount = async (ctx) => {
+  const count = await _searchDocCount(_makeFilterData(ctx.query));
 
-  const projection = {
-    score: { $meta: 'textScore' }, // добавить в данные оценку текстового поиска (релевантность)
-  };
-  return Doc.find(filter, projection)
+  ctx.status = 200;
+  ctx.body = { count };
+};
+
+async function _searchDoc(data) {
+  return Doc.find(data.filter, data.projection)
     .sort({
       _id: -1,
       //  score: { $meta: "textScore" } //сортировка по релевантности
     })
-    .limit(limit)
+    .limit(data.limit)
     .populate('acceptor.user')
     .populate('recipient.user')
     .populate('directing')
@@ -64,44 +53,64 @@ async function _searchDoc({ query, lastId, limit, acceptor, recipient, author })
     .populate('author');
 }
 
-module.exports.searchByTitle = async (ctx) => {
-  const docs = await _searchDoc({ 
-    ...ctx.query,
-   });
+async function _searchDocCount(data) {
+  return Doc.find(data.filter, data.projection)
+    .sort({
+      _id: -1,
+    })
+    .count()
+}
 
-  ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
-};
+function _makeFilterData({ query, lastId, limit, user, acceptor, recipient, author, directing, tasc }) {
+  const filter = {};
+  const projection = {};
 
-module.exports.searchByAcceptor = async (ctx) => {
-  const docs = await _searchDoc({ 
-    acceptor: ctx.params.id || null,
-    ...ctx.query,
-   });
+  if (directing) {
+    filter.directing = directing
+  }
 
-  ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
-};
+  if (tasc) {
+    filter.tasc = tasc
+  }
 
-module.exports.searchByRecipient = async (ctx) => {
-  const docs = await _searchDoc({ 
-    recipient: ctx.params.id || null,
-    ...ctx.query,
-   });
+  if (query) {
+    filter.$text = {
+      $search: query,
+      $language: 'russian',
+    }
 
-  ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
-};
+    projection.score = { $meta: 'textScore' } // добавить в данные оценку текстового поиска (релевантность)
+  }
 
-module.exports.searchByAuthor = async (ctx) => {
-  const docs = await _searchDoc({ 
-    author: ctx.params.id || null,
-    ...ctx.query,
-   });
+  if (user) {
+    if (acceptor === '1') {
+      filter.acceptor = { $elemMatch: { user: user } }
+    }
 
-  ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
-};
+    if (recipient === '1') {
+      filter.recipient = { user: user }
+    }
+
+    if (author === '1') {
+      filter.author = user
+    }
+  }
+
+  if (lastId) {
+    filter._id = { $lt: lastId };
+  }
+
+  return { filter, projection, limit }
+}
+
+
+
+
+
+
+
+
+
 
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
