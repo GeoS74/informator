@@ -263,12 +263,30 @@ function _makeFilterData({
   }
 
   if (user) {
-    if (acceptor === '1') {
-      filter.acceptor = { $elemMatch: { user } };
+    switch (acceptor) {
+      case '0':
+        filter.acceptor = { $elemMatch: { user, accept: false } };
+        break;
+      case '1':
+        filter.acceptor = { $elemMatch: { user, accept: true } };
+        break;
+      case '2':
+        filter.acceptor = { $elemMatch: { user } };
+        break;
+      default:
     }
 
-    if (recipient === '1') {
-      filter.recipient = { $elemMatch: { user } };
+    switch (recipient) {
+      case '0':
+        filter.recipient = { $elemMatch: { user, accept: false } };
+        break;
+      case '1':
+        filter.recipient = { $elemMatch: { user, accept: true } };
+        break;
+      case '2':
+        filter.recipient = { $elemMatch: { user } };
+        break;
+      default:
     }
 
     if (author === '1') {

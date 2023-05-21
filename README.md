@@ -10,6 +10,7 @@
 Маршрут:
 ```
 GET /api/informator/docflow/search/doc
+GET /api/informator/docflow/search/doc/count
 ```
 
 Параметры:
@@ -17,12 +18,11 @@ GET /api/informator/docflow/search/doc
 - last (id последнего полученного документа)
 - limit (кол-во документов в ответе)
 - user (uid пользователя для выборки документов по юзеру)
-- acceptor (если 1 - то ищет user в массиве acceptor)
-- recipient (если 1 - то ищет user в массиве recipient)
+- acceptor (0 - не подписал,  1 - подписал, 2 - общий список)
+- recipient (0 - не подписал,  1 - подписал, 2 - общий список)
 - author (если 1 - то ищет user в авторах)
 - directing (id направления для документа)
 - tasc (id типа документа)
-
 
 
 #### Получение всех документов
