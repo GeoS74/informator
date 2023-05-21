@@ -162,13 +162,15 @@ function _checkTitle(title) {
 }
 
 function _deleteFile(files) {
-  for (const file of Object.values(files)) {
-    // received more than 1 file in any field with the same name
-    if (Array.isArray(file)) {
-      _deleteFile(file);
-    } else {
-      fs.unlink(file.filepath)
-        .catch((error) => logger.error(error.mesasge));
+  if(files){
+    for (const file of Object.values(files)) {
+      // received more than 1 file in any field with the same name
+      if (Array.isArray(file)) {
+        _deleteFile(file);
+      } else {
+        fs.unlink(file.filepath)
+          .catch((error) => logger.error(error.mesasge));
+      }
     }
   }
 }
