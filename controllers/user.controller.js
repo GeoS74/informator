@@ -24,11 +24,86 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.search = async (ctx) => {
-  const users = await _searchUsers(ctx.query?.email || '');
+  const users = await _searchUsers(_makeFilterData(ctx.query));
 
   ctx.status = 200;
   ctx.body = users.map((user) => mapper(user));
 };
+
+async function _searchUsers(data) {
+  return User.find(data.filter)
+    .sort({ _id: 1 })
+    .limit(data.limit)
+    .populate({
+      path: 'roles',
+      populate: [
+        { path: 'directings.directing' },
+        { path: 'directings.tasks.task' },
+        { path: 'directings.tasks.actions' },
+      ],
+    });
+}
+
+function _makeFilterData({
+  search, lastId, limit, user, acceptor, recipient, author, directingId, tascId,
+}) {
+  const filter = {};
+  const optional = {};
+
+  if (directingId) {
+    optional.directingId = directingId;
+  }
+
+  if (tascId) {
+    optional.tascId = tascId;
+  }
+
+  if (search) {
+    filter.fullName = {
+      $regex: new RegExp(`${search}`),
+      $options: 'i',
+    }
+  }
+
+  if (user) {
+    switch (acceptor) {
+      case '0':
+        filter.acceptor = { $elemMatch: { user, accept: false } };
+        break;
+      case '1':
+        filter.acceptor = { $elemMatch: { user, accept: true } };
+        break;
+      case '2':
+        filter.acceptor = { $elemMatch: { user } };
+        break;
+      default:
+    }
+
+    switch (recipient) {
+      case '0':
+        filter.recipient = { $elemMatch: { user, accept: false } };
+        break;
+      case '1':
+        filter.recipient = { $elemMatch: { user, accept: true } };
+        break;
+      case '2':
+        filter.recipient = { $elemMatch: { user } };
+        break;
+      default:
+    }
+
+    if (author === '1') {
+      filter.author = user;
+    }
+  }
+
+  if (lastId) {
+    filter._id = { $lt: lastId };
+  }
+
+  return { filter, optional, limit };
+}
+
 
 module.exports.add = async (ctx) => {
   const user = await _addUser(ctx.user);
@@ -110,7 +185,7 @@ function _getAllUsers() {
     });
 }
 
-function _searchUsers(needle) {
+function __searchUsers(needle) {
   return User.find({
     fullName: {
       $regex: new RegExp(`${needle}`),

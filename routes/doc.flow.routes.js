@@ -6,6 +6,7 @@ const mount = require('koa-mount');
 
 const controller = require('../controllers/docflow.controller');
 const validator = require('../middleware/validators/docflow.params.validator');
+const validatorSearch = require('../middleware/validators/search.params.validator')
 const accessCheck = require('../middleware/access.check');
 
 (async () => {
@@ -36,17 +37,23 @@ router.use(accessCheck);
 
 router.get(
   '/search/doc/',
-  validator.query,
-  validator.lastId,
-  validator.limit,
+  validatorSearch.searchString,
+  validatorSearch.lastId,
+  validatorSearch.limit,
+  validatorSearch.user,
+  validatorSearch.directingId,
+  validatorSearch.tascId,
   controller.search,
 );
 
 router.get(
   '/search/doc/count',
-  validator.query,
-  validator.lastId,
-  validator.limit,
+  validatorSearch.searchString,
+  validatorSearch.lastId,
+  validatorSearch.limit,
+  validatorSearch.user,
+  validatorSearch.directingId,
+  validatorSearch.tascId,
   controller.searchCount,
 );
 

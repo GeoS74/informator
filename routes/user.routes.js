@@ -6,6 +6,7 @@ const mount = require('koa-mount');
 
 const controller = require('../controllers/user.controller');
 const validator = require('../middleware/validators/user.params.validator');
+const validatorSearch = require('../middleware/validators/search.params.validator')
 const accessCheck = require('../middleware/access.check');
 
 (async () => {
@@ -40,9 +41,17 @@ const router = new Router({ prefix: '/api/informator/user' });
 
 router.use(accessCheck, validator.email);
 
+router.get('/search',
+  validatorSearch.searchString,
+  validatorSearch.lastId,
+  validatorSearch.limit,
+  validatorSearch.directingId,
+  validatorSearch.tascId,
+  controller.search,
+);
+
 router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
 router.get('/', controller.get);
-router.get('/search', controller.search);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
 router.patch('/', koaBody({ multipart: true }), validator.params, controller.update);
 router.delete('/', controller.delete);

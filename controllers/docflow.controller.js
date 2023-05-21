@@ -240,22 +240,22 @@ async function _searchDocCount(data) {
 }
 
 function _makeFilterData({
-  query, lastId, limit, user, acceptor, recipient, author, directing, tasc,
+  search, lastId, limit, user, acceptor, recipient, author, directingId, tascId,
 }) {
   const filter = {};
   const projection = {};
 
-  if (directing) {
-    filter.directing = directing;
+  if (directingId) {
+    filter.directing = directingId;
   }
 
-  if (tasc) {
-    filter.tasc = tasc;
+  if (tascId) {
+    filter.tasc = tascId;
   }
 
-  if (query) {
+  if (search) {
     filter.$text = {
-      $search: query,
+      $search: search,
       $language: 'russian',
     };
 
