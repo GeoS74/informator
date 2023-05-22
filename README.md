@@ -22,7 +22,7 @@ GET /api/informator/docflow/search/doc/count
 - recipient (0 - не подписал,  1 - подписал, 2 - общий список)
 - author (если 1 - то ищет user в авторах)
 - directing (id направления для документа)
-- tasc (id типа документа)
+- task (id типа документа)
 
 
 #### Получение всех документов

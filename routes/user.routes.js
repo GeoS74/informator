@@ -47,6 +47,7 @@ router.get('/search',
   validatorSearch.limit,
   validatorSearch.directingId,
   validatorSearch.tascId,
+  
   controller.search,
 );
 

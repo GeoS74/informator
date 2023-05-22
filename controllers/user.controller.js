@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const logger = require('../libs/logger');
 
 const User = require('../models/User');
+const Role = require('../models/Role');
 const mapper = require('../mappers/user.mapper');
 
 module.exports.get = async (ctx) => {
@@ -24,7 +25,8 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.search = async (ctx) => {
-  const users = await _searchUsers(_makeFilterData(ctx.query));
+  const data = await _makeFilterData(ctx.query);
+  const users = await _searchUsers(data);
 
   ctx.status = 200;
   ctx.body = users.map((user) => mapper(user));
@@ -44,11 +46,22 @@ async function _searchUsers(data) {
     });
 }
 
-function _makeFilterData({
+async function _makeRolesByDirectingAndTask(directingId, tascId){
+  
+}
+
+async function _makeFilterData({
   search, lastId, limit, user, acceptor, recipient, author, directingId, tascId,
 }) {
   const filter = {};
   const optional = {};
+
+  await _makeRolesByDirectingAndTask(directingId, tascId)
+
+  // if(directingId && tascId){
+  //   if(acceptor === '1') {
+  //   }
+  // }
 
   if (directingId) {
     optional.directingId = directingId;
@@ -103,6 +116,19 @@ function _makeFilterData({
 
   return { filter, optional, limit };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 module.exports.add = async (ctx) => {

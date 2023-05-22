@@ -47,13 +47,13 @@ module.exports.directingId = async (ctx, next) => {
 };
 
 module.exports.tascId = async (ctx, next) => {
-  if (ctx.query.tasc) {
-    if (!isValidObjectId(ctx.query.tasc)) {
-      ctx.throw(400, 'invalid tasc id');
+  if (ctx.query.task) {
+    if (!isValidObjectId(ctx.query.task)) {
+      ctx.throw(400, 'invalid task id');
     }
   }
 
-  ctx.query.tascId = ctx.query.tasc;
+  ctx.query.taskId = ctx.query.task;
 
   await next();
 };

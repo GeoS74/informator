@@ -36,13 +36,15 @@ const router = new Router({ prefix: '/api/informator/docflow' });
 router.use(accessCheck);
 
 router.get(
-  '/search/doc/',
+  '/search/doc',
   validatorSearch.searchString,
   validatorSearch.lastId,
   validatorSearch.limit,
   validatorSearch.user,
   validatorSearch.directingId,
   validatorSearch.tascId,
+
+  controller.makeAccessRightsByUser,
   controller.search,
 );
 
@@ -54,6 +56,8 @@ router.get(
   validatorSearch.user,
   validatorSearch.directingId,
   validatorSearch.tascId,
+
+  controller.makeAccessRightsByUser,
   controller.searchCount,
 );
 
