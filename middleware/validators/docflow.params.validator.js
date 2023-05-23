@@ -162,7 +162,7 @@ function _checkTitle(title) {
 }
 
 function _deleteFile(files) {
-  if(files){
+  if (files) {
     for (const file of Object.values(files)) {
       // received more than 1 file in any field with the same name
       if (Array.isArray(file)) {

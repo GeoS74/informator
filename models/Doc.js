@@ -8,13 +8,17 @@ const Signatory = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
+    index: true,
   },
   accept: Boolean,
 });
 
 const Schema = new mongoose.Schema({
   num: Number, // идентификатор в рамках документов одного типа и направления
-  acceptor: [Signatory],
+  acceptor: {
+    type: [Signatory],
+    // index: true, // если указать так, то индекс не создаётся
+  },
   recipient: [Signatory],
   title: {
     type: String,
@@ -27,11 +31,13 @@ const Schema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: Directing,
     required: 'не заполнено обязательное поле {PATH}',
+    index: true,
   },
   task: {
     type: mongoose.Schema.Types.ObjectId,
     ref: Task,
     required: 'не заполнено обязательное поле {PATH}',
+    index: true,
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,

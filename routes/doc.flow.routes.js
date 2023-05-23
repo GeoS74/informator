@@ -6,7 +6,7 @@ const mount = require('koa-mount');
 
 const controller = require('../controllers/docflow.controller');
 const validator = require('../middleware/validators/docflow.params.validator');
-const validatorSearch = require('../middleware/validators/search.params.validator')
+const validatorSearch = require('../middleware/validators/search.params.validator');
 const accessCheck = require('../middleware/access.check');
 
 (async () => {

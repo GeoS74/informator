@@ -46,8 +46,8 @@ async function _searchUsers(data) {
     });
 }
 
-async function _makeRolesByDirectingAndTask(directingId, tascId){
-  
+async function _makeRolesByDirectingAndTask(directingId, tascId) {
+
 }
 
 async function _makeFilterData({
@@ -56,7 +56,7 @@ async function _makeFilterData({
   const filter = {};
   const optional = {};
 
-  await _makeRolesByDirectingAndTask(directingId, tascId)
+  await _makeRolesByDirectingAndTask(directingId, tascId);
 
   // if(directingId && tascId){
   //   if(acceptor === '1') {
@@ -75,7 +75,7 @@ async function _makeFilterData({
     filter.fullName = {
       $regex: new RegExp(`${search}`),
       $options: 'i',
-    }
+    };
   }
 
   if (user) {
@@ -116,20 +116,6 @@ async function _makeFilterData({
 
   return { filter, optional, limit };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports.add = async (ctx) => {
   const user = await _addUser(ctx.user);

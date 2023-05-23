@@ -3,7 +3,7 @@ const path = require('path');
 const Doc = require('../models/Doc');
 const mapper = require('../mappers/docflow.mapper');
 const logger = require('../libs/logger');
-const controllerUser = require('./user.controller')
+const controllerUser = require('./user.controller');
 
 module.exports.get = async (ctx) => {
   const doc = await _getDoc(ctx.params.id);
@@ -211,26 +211,26 @@ module.exports.makeAccessRightsByUser = async (ctx, next) => {
 
   ctx.accessRightsUser = [];
 
-  user.roles.map(role => (
-    role.directings.map(directing => (
-      directing.tasks.map(task => {
-        ctx.accessRightsUser.push([directing.id, task.id])
-      })
+  user.roles.map((role) => (
+    role.directings.map((directing) => (
+      directing.tasks.map((task) => ctx.accessRightsUser.push([directing.id, task.id]))
     ))
-  ))
+  ));
 
   await next();
-}
+};
 
 module.exports.search = async (ctx) => {
-  const docs = await _searchDoc(_makeFilterData({accessRightsUser: ctx.accessRightsUser, ...ctx.query}));
+  const data = _makeFilterData({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const docs = await _searchDoc(data);
 
   ctx.status = 200;
   ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
 module.exports.searchCount = async (ctx) => {
-  const count = await _searchDocCount(_makeFilterData({accessRightsUser: ctx.accessRightsUser, ...ctx.query}));
+  const data = _makeFilterData({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const count = await _searchDocCount(data);
 
   ctx.status = 200;
   ctx.body = { count };
@@ -259,15 +259,15 @@ async function _searchDocCount(data) {
 }
 
 function _makeFilterData({
-  search, 
-  lastId, 
-  limit, 
-  user, 
-  acceptor, 
-  recipient, 
-  author, 
-  directingId, 
-  taskId, 
+  search,
+  lastId,
+  limit,
+  user,
+  acceptor,
+  recipient,
+  author,
+  directingId,
+  taskId,
   accessRightsUser,
 }) {
   const filter = {};
@@ -275,12 +275,12 @@ function _makeFilterData({
 
   // console.log(accessRightsUser)
 
-  filter.$or =  accessRightsUser.map(e => ({
+  filter.$or = accessRightsUser.map((e) => ({
     $and: [
-      {directing: e[0]},
-      {task: e[1]}
-    ]
-  }))
+      { directing: e[0] },
+      { task: e[1] },
+    ],
+  }));
 
   if (directingId) {
     filter.directing = directingId;
