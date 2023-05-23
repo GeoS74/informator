@@ -5,6 +5,7 @@ const logger = require('../libs/logger');
 
 const User = require('../models/User');
 const Role = require('../models/Role');
+const Action = require('../models/Action');
 const mapper = require('../mappers/user.mapper');
 
 module.exports.get = async (ctx) => {
@@ -46,29 +47,46 @@ async function _searchUsers(data) {
     });
 }
 
-async function _makeRolesByDirectingAndTask(directingId, tascId) {
 
+const ACTIONS_FROZEN_LIST = new Map();
+Action.find({}).then(res => res.map(e => ACTIONS_FROZEN_LIST.set(e.title, e.id)))
+
+async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient) {
+  const act = [];
+  if(acceptor === '1') {
+    act.push(ACTIONS_FROZEN_LIST.get('Согласовать'));
+  }
+  if(recipient === '1') {
+    act.push(ACTIONS_FROZEN_LIST.get('Ознакомиться'));
+  }
+
+    return Role.find({
+      directings: {
+        $elemMatch: {
+          directing: directingId,
+          tasks: {
+            $elemMatch: {
+              task: taskId,
+              actions: {$in: act}
+            }
+          }
+        }
+      }
+    })
+      .then(res => res.map(e => e._id));
 }
 
 async function _makeFilterData({
-  search, lastId, limit, user, acceptor, recipient, author, directingId, tascId,
+  search, lastId, limit, user, acceptor, recipient, author, directingId, taskId,
 }) {
   const filter = {};
   const optional = {};
 
-  await _makeRolesByDirectingAndTask(directingId, tascId);
-
-  // if(directingId && tascId){
-  //   if(acceptor === '1') {
-  //   }
-  // }
-
-  if (directingId) {
-    optional.directingId = directingId;
-  }
-
-  if (tascId) {
-    optional.tascId = tascId;
+  if(directingId && taskId) {
+    const roles = await _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient);
+    if (roles.length) {
+      filter.roles = { $in: roles }
+    }
   }
 
   if (search) {
@@ -78,37 +96,33 @@ async function _makeFilterData({
     };
   }
 
-  if (user) {
-    switch (acceptor) {
-      case '0':
-        filter.acceptor = { $elemMatch: { user, accept: false } };
-        break;
-      case '1':
-        filter.acceptor = { $elemMatch: { user, accept: true } };
-        break;
-      case '2':
-        filter.acceptor = { $elemMatch: { user } };
-        break;
-      default:
-    }
+  // if (user) {
+  //   switch (acceptor) {
+  //     case '0':
+  //       filter.acceptor = { $elemMatch: { user, accept: false } };
+  //       break;
+  //     case '1':
+  //       filter.acceptor = { $elemMatch: { user, accept: true } };
+  //       break;
+  //     case '2':
+  //       filter.acceptor = { $elemMatch: { user } };
+  //       break;
+  //     default:
+  //   }
 
-    switch (recipient) {
-      case '0':
-        filter.recipient = { $elemMatch: { user, accept: false } };
-        break;
-      case '1':
-        filter.recipient = { $elemMatch: { user, accept: true } };
-        break;
-      case '2':
-        filter.recipient = { $elemMatch: { user } };
-        break;
-      default:
-    }
-
-    if (author === '1') {
-      filter.author = user;
-    }
-  }
+  //   switch (recipient) {
+  //     case '0':
+  //       filter.recipient = { $elemMatch: { user, accept: false } };
+  //       break;
+  //     case '1':
+  //       filter.recipient = { $elemMatch: { user, accept: true } };
+  //       break;
+  //     case '2':
+  //       filter.recipient = { $elemMatch: { user } };
+  //       break;
+  //     default:
+  //   }
+  // }
 
   if (lastId) {
     filter._id = { $lt: lastId };
