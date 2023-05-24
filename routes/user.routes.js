@@ -52,7 +52,7 @@ router.get(
   controller.search,
 );
 
-router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
+// router.get('/all', /* добавить сюда проверку на админа */ controller.getAll);
 router.get('/', controller.get);
 router.post('/', koaBody({ multipart: true }), validator.params, controller.add);
 router.patch('/', koaBody({ multipart: true }), validator.params, controller.update);

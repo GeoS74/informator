@@ -8,28 +8,37 @@ const Role = require('../models/Role');
 const Action = require('../models/Action');
 const mapper = require('../mappers/user.mapper');
 
-module.exports.get = async (ctx) => {
-  const user = await _getUser(ctx.user);
-  if (!user) {
-    ctx.throw(404, 'user not found');
-  }
-
-  ctx.status = 200;
-  ctx.body = mapper(user);
-};
-
-module.exports.getAll = async (ctx) => {
-  const users = await _getAllUsers();
-
-  ctx.status = 200;
-  ctx.body = users.map((user) => mapper(user));
-};
+/**
+ * поиск пользователя
+ *
+ * возможные параметры запроса:
+ * - search
+ * - last
+ * - limit
+ * - directingId
+ * - taskId
+ * - acceptor
+ * - recipient
+ *
+ * Поиск: doc -> user
+ * Если передаются одновременно параметры directingId и taskId
+ * то предполагается, что поиск инициирцется документом
+ * документ, в свою очередь всегда знает направление и свой тип
+ * Возвращается массив пользователей, которым доступен данный тип документа
+ * Возвращается пустой массив если тип документа не доступен ни одному пользователю
+ *
+ * Реализация поиска:
+ * 1) собрать массив ролей, которые могут взаимодействовать
+ *    с данным типом документа (см. фнкцию _makeRolesByDirectingAndTask)
+ * 2) добавить в фильтр условие для выборки пользователей с учётом ролей
+ *
+ */
 
 module.exports.search = async (ctx) => {
-  // _makeFilterData выбрасывает исключение
+  // _makeFilterRules выбрасывает исключение
   // поэтому добавлен блок try...catch
   try {
-    const data = await _makeFilterData(ctx.query);
+    const data = await _makeFilterRules(ctx.query);
     const users = await _searchUsers(data);
 
     ctx.body = users.map((user) => mapper(user));
@@ -53,6 +62,23 @@ async function _searchUsers(data) {
     });
 }
 
+/**
+ * условие выбора пользователей по типу документа
+ * может включать в себя дополнительные условия,
+ * связанные с настройками возможных действий
+ *
+ * Cписок действий жёстко зафиксирован и
+ * в момент создания базы данных создаётся автоматически и изменению не подлежит,
+ * записи получают каждый раз новые id
+ * эти id документ не знает, соответственно клиент их передать не может
+ *
+ * Для решения этой проблемы создаётся ACTIONS_FROZEN_LIST
+ * по сути это список, в котором ключи - это значения из коллекции действий
+ * значения - это ключи из коллекции действий
+ *
+ * таким образом _makeRolesByDirectingAndTask может добавлять id действий
+ * в условие выборки
+ */
 const ACTIONS_FROZEN_LIST = new Map();
 Action.find({}).then((res) => res.map((e) => ACTIONS_FROZEN_LIST.set(e.title, e.id)));
 
@@ -78,6 +104,8 @@ async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recip
   if (recipient === '1') {
     act.push(ACTIONS_FROZEN_LIST.get('Ознакомиться'));
   }
+
+  // добавить массив действий в условие выборки
   if (act.length) {
     filter.directings.$elemMatch.tasks.$elemMatch.actions = { $in: act };
   }
@@ -86,11 +114,16 @@ async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recip
     .then((res) => res.map((e) => e._id));
 }
 
-async function _makeFilterData({
-  search, lastId, limit, acceptor, recipient, directingId, taskId,
+async function _makeFilterRules({
+  search,
+  lastId,
+  limit,
+  acceptor,
+  recipient,
+  directingId,
+  taskId,
 }) {
   const filter = {};
-  const optional = {};
 
   if (directingId && taskId) {
     const roles = await _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient);
@@ -107,40 +140,29 @@ async function _makeFilterData({
     };
   }
 
-  // if (user) {
-  //   switch (acceptor) {
-  //     case '0':
-  //       filter.acceptor = { $elemMatch: { user, accept: false } };
-  //       break;
-  //     case '1':
-  //       filter.acceptor = { $elemMatch: { user, accept: true } };
-  //       break;
-  //     case '2':
-  //       filter.acceptor = { $elemMatch: { user } };
-  //       break;
-  //     default:
-  //   }
-
-  //   switch (recipient) {
-  //     case '0':
-  //       filter.recipient = { $elemMatch: { user, accept: false } };
-  //       break;
-  //     case '1':
-  //       filter.recipient = { $elemMatch: { user, accept: true } };
-  //       break;
-  //     case '2':
-  //       filter.recipient = { $elemMatch: { user } };
-  //       break;
-  //     default:
-  //   }
-  // }
-
   if (lastId) {
     filter._id = { $lt: lastId };
   }
 
-  return { filter, optional, limit };
+  return { filter, limit };
 }
+
+module.exports.get = async (ctx) => {
+  const user = await _getUser(ctx.user);
+  if (!user) {
+    ctx.throw(404, 'user not found');
+  }
+
+  ctx.status = 200;
+  ctx.body = mapper(user);
+};
+
+module.exports.getAll = async (ctx) => {
+  const users = await _getAllUsers();
+
+  ctx.status = 200;
+  ctx.body = users.map((user) => mapper(user));
+};
 
 module.exports.add = async (ctx) => {
   const user = await _addUser(ctx.user);

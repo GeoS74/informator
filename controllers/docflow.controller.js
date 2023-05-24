@@ -202,7 +202,33 @@ async function _processingScans(scans) {
   return res;
 }
 
-/** search docs */
+/**
+ * поиск пользователя
+ *
+ * возможные параметры запроса:
+ * - search
+ * - last
+ * - limit
+ * - user
+ * - directingId
+ * - taskId
+ * - acceptor
+ * - recipient
+ * - author
+ *
+ * Поиск: user -> doc
+ * Если передаётся параметр user, то выборки возможна по документам
+ * которые пользователь подписал, согласовал или является автором
+ *
+ * Важно: используется middleware makeAccessRightsByUser()
+ * Поиск возвращает документы доступные пользователю
+ *
+ * Реализация поиска:
+ * 1) собрать массив доступных для пользователя типов документов
+ *    примерно такого вида: [[id_direction, id_task], [id_direction, id_task], ...]
+ * 2) добавить в фильтр условие выборки документов с учётом доступных связок напр.-тип
+ *
+ */
 
 module.exports.makeAccessRightsByUser = async (ctx, next) => {
   await controllerUser.get.call(this, ctx);
@@ -221,7 +247,7 @@ module.exports.makeAccessRightsByUser = async (ctx, next) => {
 };
 
 module.exports.search = async (ctx) => {
-  const data = _makeFilterData({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const data = _makeFilterRules({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
   const docs = await _searchDoc(data);
 
   ctx.status = 200;
@@ -229,7 +255,7 @@ module.exports.search = async (ctx) => {
 };
 
 module.exports.searchCount = async (ctx) => {
-  const data = _makeFilterData({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const data = _makeFilterRules({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
   const count = await _searchDocCount(data);
 
   ctx.status = 200;
@@ -251,14 +277,14 @@ async function _searchDoc(data) {
 }
 
 async function _searchDocCount(data) {
-  return Doc.find(data.filter, data.projection)
+  return Doc.find(data.filter)
     .sort({
       _id: -1,
     })
     .count();
 }
 
-function _makeFilterData({
+function _makeFilterRules({
   search,
   lastId,
   limit,
@@ -273,8 +299,8 @@ function _makeFilterData({
   const filter = {};
   const projection = {};
 
-  // console.log(accessRightsUser)
-
+  // кол-во условий 'и' пропорционально кол-ву доступных типов док-тов для пользователя
+  // использование условия тестировалось на 5 млн. записях
   filter.$or = accessRightsUser.map((e) => ({
     $and: [
       { directing: e[0] },
