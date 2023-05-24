@@ -26,11 +26,17 @@ module.exports.getAll = async (ctx) => {
 };
 
 module.exports.search = async (ctx) => {
-  const data = await _makeFilterData(ctx.query);
-  const users = await _searchUsers(data);
+  // _makeFilterData выбрасывает исключение
+  // поэтому добавлен блок try...catch
+  try {
+    const data = await _makeFilterData(ctx.query);
+    const users = await _searchUsers(data);
 
+    ctx.body = users.map((user) => mapper(user));
+  } catch (error) {
+    ctx.body = [];
+  }
   ctx.status = 200;
-  ctx.body = users.map((user) => mapper(user));
 };
 
 async function _searchUsers(data) {
@@ -47,46 +53,51 @@ async function _searchUsers(data) {
     });
 }
 
-
 const ACTIONS_FROZEN_LIST = new Map();
-Action.find({}).then(res => res.map(e => ACTIONS_FROZEN_LIST.set(e.title, e.id)))
+Action.find({}).then((res) => res.map((e) => ACTIONS_FROZEN_LIST.set(e.title, e.id)));
 
 async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient) {
+  const filter = {
+    directings: {
+      $elemMatch: {
+        directing: directingId,
+        tasks: {
+          $elemMatch: {
+            task: taskId,
+            // actions: {$in: act}
+          },
+        },
+      },
+    },
+  };
+
   const act = [];
-  if(acceptor === '1') {
+  if (acceptor === '1') {
     act.push(ACTIONS_FROZEN_LIST.get('Согласовать'));
   }
-  if(recipient === '1') {
+  if (recipient === '1') {
     act.push(ACTIONS_FROZEN_LIST.get('Ознакомиться'));
   }
+  if (act.length) {
+    filter.directings.$elemMatch.tasks.$elemMatch.actions = { $in: act };
+  }
 
-    return Role.find({
-      directings: {
-        $elemMatch: {
-          directing: directingId,
-          tasks: {
-            $elemMatch: {
-              task: taskId,
-              actions: {$in: act}
-            }
-          }
-        }
-      }
-    })
-      .then(res => res.map(e => e._id));
+  return Role.find(filter)
+    .then((res) => res.map((e) => e._id));
 }
 
 async function _makeFilterData({
-  search, lastId, limit, user, acceptor, recipient, author, directingId, taskId,
+  search, lastId, limit, acceptor, recipient, directingId, taskId,
 }) {
   const filter = {};
   const optional = {};
 
-  if(directingId && taskId) {
+  if (directingId && taskId) {
     const roles = await _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient);
-    if (roles.length) {
-      filter.roles = { $in: roles }
+    if (!roles.length) {
+      throw new Error();
     }
+    filter.roles = { $in: roles };
   }
 
   if (search) {
@@ -201,24 +212,6 @@ function _getUser({ email }) {
 
 function _getAllUsers() {
   return User.find().sort({ _id: 1 })
-    .populate({
-      path: 'roles',
-      populate: [
-        { path: 'directings.directing' },
-        { path: 'directings.tasks.task' },
-        { path: 'directings.tasks.actions' },
-      ],
-    });
-}
-
-function __searchUsers(needle) {
-  return User.find({
-    fullName: {
-      $regex: new RegExp(`${needle}`),
-      $options: 'i',
-    },
-  })
-    .sort({ _id: 1 })
     .populate({
       path: 'roles',
       populate: [
