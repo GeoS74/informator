@@ -37,11 +37,11 @@ const router = new Router({ prefix: '/api/informator/docflow' });
  * все роуты доступны только при наличии access токена
  * после проверки access токена в массив ctx.accessDocTypes
  * записываются все пары (напр./тип док-та)
- * 
+ *
  * документы должны быть доступны для пользователя,
  * поэтому сначала выполняется проверка прав на взаимодействие с данным типом документа
  * Если прав нет, возвращается ошибка 403
- * 
+ *
  */
 
 router.use(accessCheck, validator.email, controller.getMe, controller.accessDocTypes);
@@ -76,7 +76,7 @@ router.get(
   validator.objectId,
   validator.checkAccessDocTypesById,
 
-  controller.get
+  controller.get,
 );
 
 router.post(
@@ -112,7 +112,8 @@ router.delete(
   validator.objectId,
   validator.checkAccessDocTypesById,
 
-  controller.delete);
+  controller.delete,
+);
 
 router.patch(
   '/file/:id',

@@ -11,7 +11,7 @@ module.exports.getMe = async (ctx, next) => {
   ctx.user = ctx.body;
 
   await next();
-}
+};
 
 module.exports.accessDocTypes = async (ctx, next) => {
   ctx.accessDocTypes = [];
@@ -23,7 +23,7 @@ module.exports.accessDocTypes = async (ctx, next) => {
   ));
 
   await next();
-}
+};
 
 module.exports.get = async (ctx) => {
   const doc = await _getDoc(ctx.params.id);
@@ -251,19 +251,37 @@ async function _processingScans(scans) {
  */
 
 module.exports.search = async (ctx) => {
-  const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
-  const docs = await _searchDoc(data);
+  // _makeFilterRules выбрасывает исключение
+  // поэтому добавлен блок try...catch
+  try {
+    const data = _makeFilterRules({
+      accessDocTypes: ctx.accessDocTypes,
+      user: ctx.user.uid,
+      ...ctx.query,
+    });
+    const docs = await _searchDoc(data);
+
+    ctx.body = docs.map((doc) => (mapper(doc)));
+  } catch (error) {
+    ctx.body = [];
+  }
 
   ctx.status = 200;
-  ctx.body = docs.map((doc) => (mapper(doc)));
 };
 
 module.exports.searchCount = async (ctx) => {
-  const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
-  const count = await _searchDocCount(data);
+  // _makeFilterRules выбрасывает исключение
+  // поэтому добавлен блок try...catch
+  try {
+    const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
+    const count = await _searchDocCount(data);
+
+    ctx.body = { count };
+  } catch (error) {
+    ctx.body = { count: 0 };
+  }
 
   ctx.status = 200;
-  ctx.body = { count };
 };
 
 async function _searchDoc(data) {
@@ -293,6 +311,7 @@ function _makeFilterRules({
   lastId,
   limit,
   acceptor,
+  user,
   recipient,
   author,
   directingId,
@@ -301,6 +320,10 @@ function _makeFilterRules({
 }) {
   const filter = {};
   const projection = {};
+
+  if (!accessDocTypes.length) {
+    throw new Error();
+  }
 
   // кол-во условий 'и' пропорционально кол-ву доступных типов док-тов для пользователя
   // использование условия тестировалось на 5 млн. записях
@@ -328,37 +351,35 @@ function _makeFilterRules({
     projection.score = { $meta: 'textScore' }; // добавить в данные оценку текстового поиска (релевантность)
   }
 
-  // if (user) {
-  //   switch (acceptor) {
-  //     case '0':
-  //       filter.acceptor = { $elemMatch: { user, accept: false } };
-  //       break;
-  //     case '1':
-  //       filter.acceptor = { $elemMatch: { user, accept: true } };
-  //       break;
-  //     case '2':
-  //       filter.acceptor = { $elemMatch: { user } };
-  //       break;
-  //     default:
-  //   }
+  switch (acceptor) {
+    case '0':
+      filter.acceptor = { $elemMatch: { user, accept: false } };
+      break;
+    case '1':
+      filter.acceptor = { $elemMatch: { user, accept: true } };
+      break;
+    case '2':
+      filter.acceptor = { $elemMatch: { user } };
+      break;
+    default:
 
-  //   switch (recipient) {
-  //     case '0':
-  //       filter.recipient = { $elemMatch: { user, accept: false } };
-  //       break;
-  //     case '1':
-  //       filter.recipient = { $elemMatch: { user, accept: true } };
-  //       break;
-  //     case '2':
-  //       filter.recipient = { $elemMatch: { user } };
-  //       break;
-  //     default:
-  //   }
+      switch (recipient) {
+        case '0':
+          filter.recipient = { $elemMatch: { user, accept: false } };
+          break;
+        case '1':
+          filter.recipient = { $elemMatch: { user, accept: true } };
+          break;
+        case '2':
+          filter.recipient = { $elemMatch: { user } };
+          break;
+        default:
+      }
 
-  //   if (author === '1') {
-  //     filter.author = user;
-  //   }
-  // }
+      if (author === '1') {
+        filter.author = user;
+      }
+  }
 
   if (lastId) {
     filter._id = { $lt: lastId };

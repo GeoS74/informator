@@ -1,24 +1,24 @@
 const fs = require('fs/promises');
 const { isValidObjectId } = require('mongoose');
-const controllerDoc = require('../../controllers/docflow.controller')
+const controllerDoc = require('../../controllers/docflow.controller');
 const logger = require('../../libs/logger');
 
 // ATTENTION: use this validator only after directingId and taskId validate
 module.exports.checkAccessDocTypes = async (ctx, next) => {
   let access = false;
 
-  for(let e of ctx.accessDocTypes){
-    if(e[0] === ctx.request.body.directingId) {
-      if(e[1] === ctx.request.body.taskId) {
+  for (const e of ctx.accessDocTypes) {
+    if (e[0] === ctx.request.body.directingId) {
+      if (e[1] === ctx.request.body.taskId) {
         access = true;
         break;
       }
     }
   }
 
-  if(!access) {
+  if (!access) {
     _deleteFile(ctx.request.files);
-    ctx.throw(403, 'access to the document type is denied')
+    ctx.throw(403, 'access to the document type is denied');
   }
 
   await next();
@@ -32,18 +32,18 @@ module.exports.checkAccessDocTypesById = async (ctx, next) => {
 
   const doc = ctx.body;
 
-  for(let e of ctx.accessDocTypes){
-    if(e[0] === doc.directing.id.toString()) {
-      if(e[1] === doc.task.id.toString()) {
+  for (const e of ctx.accessDocTypes) {
+    if (e[0] === doc.directing.id.toString()) {
+      if (e[1] === doc.task.id.toString()) {
         access = true;
         break;
       }
     }
   }
 
-  if(!access) {
+  if (!access) {
     _deleteFile(ctx.request.files);
-    ctx.throw(403, 'access to the document type is denied')
+    ctx.throw(403, 'access to the document type is denied');
   }
 
   await next();
