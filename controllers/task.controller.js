@@ -1,5 +1,6 @@
 const Task = require('../models/Task');
 const mapper = require('../mappers/task.mapper');
+const Role = require('../models/Role');
 
 module.exports.get = async (ctx) => {
   const task = await _getTask(ctx.params.id);
@@ -42,9 +43,39 @@ module.exports.delete = async (ctx) => {
   if (!task) {
     ctx.throw(404, 'task not found');
   }
+
+  // необходимо чистить удаленные типы документов из БД коллекции ролей
+  await _cleanRoles(task.id);
+
   ctx.status = 200;
   ctx.body = mapper(task);
 };
+
+async function _cleanRoles(taskId) {
+  const roles = await Role.find({
+    directings: {
+      $elemMatch: {
+        tasks: {
+          $elemMatch: { task: taskId },
+        },
+      },
+    },
+  });
+
+  roles.forEach(async (role) => {
+    const updateDirectings = role.directings
+      .map((directing) => {
+        directing.tasks = directing.tasks
+          .filter((e) => e.task.toString() !== taskId);
+
+        return directing;
+      });
+
+    role.directings = updateDirectings;
+
+    await Role.findByIdAndUpdate(role.id, role);
+  });
+}
 
 function _getTask(id) {
   return Task.findById(id);
