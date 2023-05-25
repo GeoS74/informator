@@ -1,9 +1,50 @@
 const fs = require('fs/promises');
 const { isValidObjectId } = require('mongoose');
+const controllerDoc = require('../../controllers/docflow.controller')
 const logger = require('../../libs/logger');
 
-module.exports.query = async (ctx, next) => {
-  ctx.query.query = ctx.query.query || '';
+// ATTENTION: use this validator only after directingId and taskId validate
+module.exports.checkAccessDocTypes = async (ctx, next) => {
+  let access = false;
+
+  for(let e of ctx.accessDocTypes){
+    if(e[0] === ctx.request.body.directingId) {
+      if(e[1] === ctx.request.body.taskId) {
+        access = true;
+        break;
+      }
+    }
+  }
+
+  if(!access) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'access to the document type is denied')
+  }
+
+  await next();
+};
+
+// ATTENTION: use this validator only after objectId params validate
+module.exports.checkAccessDocTypesById = async (ctx, next) => {
+  let access = false;
+
+  await controllerDoc.get.call(null, ctx);
+
+  const doc = ctx.body;
+
+  for(let e of ctx.accessDocTypes){
+    if(e[0] === doc.directing.id.toString()) {
+      if(e[1] === doc.task.id.toString()) {
+        access = true;
+        break;
+      }
+    }
+  }
+
+  if(!access) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'access to the document type is denied')
+  }
 
   await next();
 };
@@ -44,14 +85,14 @@ module.exports.taskId = async (ctx, next) => {
   await next();
 };
 
-module.exports.author = async (ctx, next) => {
-  if (!_checkObjectId(ctx.request?.body?.author)) {
-    _deleteFile(ctx.request.files);
-    ctx.throw(400, 'invalid doc author');
-  }
+// module.exports.author = async (ctx, next) => {
+//   if (!_checkObjectId(ctx.request?.body?.author)) {
+//     _deleteFile(ctx.request.files);
+//     ctx.throw(400, 'invalid doc author');
+//   }
 
-  await next();
-};
+//   await next();
+// };
 
 module.exports.scanCopy = async (ctx, next) => {
   if (Object.keys(ctx.request.files).indexOf('scans') === -1) {
@@ -136,6 +177,18 @@ module.exports.recipient = async (ctx, next) => {
 
   await next();
 };
+
+module.exports.email = async (ctx, next) => {
+  if (!_checkEmail(ctx?.user?.email)) {
+    ctx.throw(400, 'invalid email');
+  }
+
+  await next();
+};
+
+function _checkEmail(email) {
+  return !!email;
+}
 
 function _checkMimeType(mimeType) {
   if (/^image\/\w+/.test(mimeType)) {

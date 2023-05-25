@@ -29,16 +29,6 @@ module.exports.limit = async (ctx, next) => {
   await next();
 };
 
-module.exports.user = async (ctx, next) => {
-  if (ctx.query.user) {
-    if (!isValidObjectId(ctx.query.user)) {
-      ctx.throw(400, 'invalid last id');
-    }
-  }
-
-  await next();
-};
-
 module.exports.directingId = async (ctx, next) => {
   if (ctx.query.directing) {
     if (!isValidObjectId(ctx.query.directing)) {
@@ -64,7 +54,6 @@ module.exports.tascId = async (ctx, next) => {
 };
 
 /**
- *
  * валидаторы acceptor, recipient, author можно не включать
  * контроллер в любом случае сравнивает значение этих параметров с определенными значениями
  * для посроения запроса

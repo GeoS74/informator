@@ -5,6 +5,26 @@ const mapper = require('../mappers/docflow.mapper');
 const logger = require('../libs/logger');
 const controllerUser = require('./user.controller');
 
+module.exports.getMe = async (ctx, next) => {
+  await controllerUser.get.call(null, ctx);
+
+  ctx.user = ctx.body;
+
+  await next();
+}
+
+module.exports.accessDocTypes = async (ctx, next) => {
+  ctx.accessDocTypes = [];
+
+  ctx.user.roles.map((role) => (
+    role.directings.map((directing) => (
+      directing.tasks.map((task) => ctx.accessDocTypes.push([directing.id, task.id]))
+    ))
+  ));
+
+  await next();
+}
+
 module.exports.get = async (ctx) => {
   const doc = await _getDoc(ctx.params.id);
 
@@ -25,7 +45,10 @@ module.exports.getAll = async (ctx) => {
 module.exports.add = async (ctx) => {
   ctx.request.body.files = await _processingScans(ctx.scans);
 
-  const doc = await _addDoc(ctx.request.body);
+  const doc = await _addDoc({
+    ...ctx.request.body,
+    author: ctx.user.uid,
+  });
 
   ctx.status = 201;
   ctx.body = mapper(doc);
@@ -131,7 +154,6 @@ function _updateDoc(id, {
   description,
   directingId,
   taskId,
-  author,
   files,
   acceptor,
   recipient,
@@ -143,7 +165,6 @@ function _updateDoc(id, {
       desc: description,
       directing: directingId,
       task: taskId,
-      author,
       $push: { files },
       acceptor,
       recipient,
@@ -209,7 +230,6 @@ async function _processingScans(scans) {
  * - search
  * - last
  * - limit
- * - user
  * - directingId
  * - taskId
  * - acceptor
@@ -230,24 +250,8 @@ async function _processingScans(scans) {
  *
  */
 
-module.exports.makeAccessRightsByUser = async (ctx, next) => {
-  await controllerUser.get.call(null, ctx);
-
-  const user = ctx.body;
-
-  ctx.accessRightsUser = [];
-
-  user.roles.map((role) => (
-    role.directings.map((directing) => (
-      directing.tasks.map((task) => ctx.accessRightsUser.push([directing.id, task.id]))
-    ))
-  ));
-
-  await next();
-};
-
 module.exports.search = async (ctx) => {
-  const data = _makeFilterRules({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
   const docs = await _searchDoc(data);
 
   ctx.status = 200;
@@ -255,7 +259,7 @@ module.exports.search = async (ctx) => {
 };
 
 module.exports.searchCount = async (ctx) => {
-  const data = _makeFilterRules({ accessRightsUser: ctx.accessRightsUser, ...ctx.query });
+  const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
   const count = await _searchDocCount(data);
 
   ctx.status = 200;
@@ -288,20 +292,19 @@ function _makeFilterRules({
   search,
   lastId,
   limit,
-  user,
   acceptor,
   recipient,
   author,
   directingId,
   taskId,
-  accessRightsUser,
+  accessDocTypes,
 }) {
   const filter = {};
   const projection = {};
 
   // кол-во условий 'и' пропорционально кол-ву доступных типов док-тов для пользователя
   // использование условия тестировалось на 5 млн. записях
-  filter.$or = accessRightsUser.map((e) => ({
+  filter.$or = accessDocTypes.map((e) => ({
     $and: [
       { directing: e[0] },
       { task: e[1] },
@@ -325,37 +328,37 @@ function _makeFilterRules({
     projection.score = { $meta: 'textScore' }; // добавить в данные оценку текстового поиска (релевантность)
   }
 
-  if (user) {
-    switch (acceptor) {
-      case '0':
-        filter.acceptor = { $elemMatch: { user, accept: false } };
-        break;
-      case '1':
-        filter.acceptor = { $elemMatch: { user, accept: true } };
-        break;
-      case '2':
-        filter.acceptor = { $elemMatch: { user } };
-        break;
-      default:
-    }
+  // if (user) {
+  //   switch (acceptor) {
+  //     case '0':
+  //       filter.acceptor = { $elemMatch: { user, accept: false } };
+  //       break;
+  //     case '1':
+  //       filter.acceptor = { $elemMatch: { user, accept: true } };
+  //       break;
+  //     case '2':
+  //       filter.acceptor = { $elemMatch: { user } };
+  //       break;
+  //     default:
+  //   }
 
-    switch (recipient) {
-      case '0':
-        filter.recipient = { $elemMatch: { user, accept: false } };
-        break;
-      case '1':
-        filter.recipient = { $elemMatch: { user, accept: true } };
-        break;
-      case '2':
-        filter.recipient = { $elemMatch: { user } };
-        break;
-      default:
-    }
+  //   switch (recipient) {
+  //     case '0':
+  //       filter.recipient = { $elemMatch: { user, accept: false } };
+  //       break;
+  //     case '1':
+  //       filter.recipient = { $elemMatch: { user, accept: true } };
+  //       break;
+  //     case '2':
+  //       filter.recipient = { $elemMatch: { user } };
+  //       break;
+  //     default:
+  //   }
 
-    if (author === '1') {
-      filter.author = user;
-    }
-  }
+  //   if (author === '1') {
+  //     filter.author = user;
+  //   }
+  // }
 
   if (lastId) {
     filter._id = { $lt: lastId };

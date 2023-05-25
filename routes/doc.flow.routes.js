@@ -33,18 +33,30 @@ const optional = {
 
 const router = new Router({ prefix: '/api/informator/docflow' });
 
-router.use(accessCheck);
+/**
+ * все роуты доступны только при наличии access токена
+ * после проверки access токена в массив ctx.accessDocTypes
+ * записываются все пары (напр./тип док-та)
+ * 
+ * документы должны быть доступны для пользователя,
+ * поэтому сначала выполняется проверка прав на взаимодействие с данным типом документа
+ * Если прав нет, возвращается ошибка 403
+ * 
+ */
+
+router.use(accessCheck, validator.email, controller.getMe, controller.accessDocTypes);
+
+// del this route
+router.get('/', validator.limit, controller.getAll);
 
 router.get(
   '/search/doc',
   validatorSearch.searchString,
   validatorSearch.lastId,
   validatorSearch.limit,
-  validatorSearch.user,
   validatorSearch.directingId,
   validatorSearch.tascId,
 
-  controller.makeAccessRightsByUser,
   controller.search,
 );
 
@@ -53,47 +65,61 @@ router.get(
   validatorSearch.searchString,
   validatorSearch.lastId,
   validatorSearch.limit,
-  validatorSearch.user,
   validatorSearch.directingId,
   validatorSearch.tascId,
 
-  controller.makeAccessRightsByUser,
   controller.searchCount,
 );
 
-router.get('/:id', validator.objectId, controller.get);
-router.get('/', validator.limit, controller.getAll);
+router.get(
+  '/:id',
+  validator.objectId,
+  validator.checkAccessDocTypesById,
+
+  controller.get
+);
+
 router.post(
   '/',
   koaBody(optional),
   validator.directingId,
   validator.taskId,
+  validator.checkAccessDocTypes,
+
   validator.title,
-  validator.author,
   validator.acceptor,
   validator.recipient,
   validator.scanCopy,
+
   controller.add,
 );
 router.patch(
   '/:id',
   koaBody(optional),
   validator.objectId,
+  validator.checkAccessDocTypesById,
+
   validator.directingId,
   validator.taskId,
   validator.title,
-  validator.author,
   validator.acceptor,
   validator.recipient,
   validator.scanCopy,
   controller.update,
 );
-router.delete('/:id', validator.objectId, controller.delete);
+router.delete(
+  '/:id',
+  validator.objectId,
+  validator.checkAccessDocTypesById,
+
+  controller.delete);
 
 router.patch(
   '/file/:id',
   koaBody(optional),
   validator.objectId,
+  validator.checkAccessDocTypesById,
+
   controller.deleteAtatchedFile,
 );
 
