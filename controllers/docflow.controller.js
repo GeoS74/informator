@@ -231,7 +231,7 @@ async function _processingScans(scans) {
  */
 
 module.exports.makeAccessRightsByUser = async (ctx, next) => {
-  await controllerUser.get.call(this, ctx);
+  await controllerUser.get.call(null, ctx);
 
   const user = ctx.body;
 

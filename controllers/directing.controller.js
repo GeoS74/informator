@@ -1,5 +1,6 @@
 const Directing = require('../models/Directing');
 const mapper = require('../mappers/directing.mapper');
+const Role = require('../models/Role');
 
 module.exports.get = async (ctx) => {
   const directing = await _getDirecting(ctx.params.id);
@@ -42,9 +43,30 @@ module.exports.delete = async (ctx) => {
   if (!directing) {
     ctx.throw(404, 'directing not found');
   }
+
+  // необходимо чистить удаленные направления из БД коллекции ролей
+  await _cleanRoles(directing.id);
+
   ctx.status = 200;
   ctx.body = mapper(directing);
 };
+
+async function _cleanRoles(deleteDirectingId) {
+  const roles = await Role.find({
+    directings: {
+      $elemMatch: { directing: deleteDirectingId },
+    },
+  });
+
+  roles.forEach(async (role) => {
+    const updateDirectings = role.directings
+      .filter((e) => e.directing.toString() !== deleteDirectingId);
+
+    role.directings = updateDirectings;
+
+    await Role.findByIdAndUpdate(role.id, role);
+  });
+}
 
 function _getDirecting(id) {
   return Directing.findById(id);
