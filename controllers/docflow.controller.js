@@ -255,9 +255,9 @@ module.exports.search = async (ctx) => {
   // поэтому добавлен блок try...catch
   try {
     const data = _makeFilterRules({
+      ...ctx.query,
       accessDocTypes: ctx.accessDocTypes,
       user: ctx.user.uid,
-      ...ctx.query,
     });
     const docs = await _searchDoc(data);
 
@@ -273,7 +273,12 @@ module.exports.searchCount = async (ctx) => {
   // _makeFilterRules выбрасывает исключение
   // поэтому добавлен блок try...catch
   try {
-    const data = _makeFilterRules({ accessDocTypes: ctx.accessDocTypes, ...ctx.query });
+    const data = _makeFilterRules({ 
+      ...ctx.query, 
+      accessDocTypes: ctx.accessDocTypes,
+      user: ctx.user.uid,
+    });
+
     const count = await _searchDocCount(data);
 
     ctx.body = { count };
