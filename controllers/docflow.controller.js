@@ -18,7 +18,13 @@ module.exports.accessDocTypes = async (ctx, next) => {
 
   ctx.user.roles.map((role) => (
     role.directings.map((directing) => (
-      directing.tasks.map((task) => ctx.accessDocTypes.push([directing.id, task.id]))
+      directing.tasks.map((task) => (
+        ctx.accessDocTypes.push([
+          directing.id,
+          task.id,
+          task.actions.map(action => action.id)
+        ])
+      ))
     ))
   ));
 
@@ -273,8 +279,8 @@ module.exports.searchCount = async (ctx) => {
   // _makeFilterRules выбрасывает исключение
   // поэтому добавлен блок try...catch
   try {
-    const data = _makeFilterRules({ 
-      ...ctx.query, 
+    const data = _makeFilterRules({
+      ...ctx.query,
       accessDocTypes: ctx.accessDocTypes,
       user: ctx.user.uid,
     });
@@ -367,24 +373,25 @@ function _makeFilterRules({
       filter.acceptor = { $elemMatch: { user } };
       break;
     default:
-
-      switch (recipient) {
-        case '0':
-          filter.recipient = { $elemMatch: { user, accept: false } };
-          break;
-        case '1':
-          filter.recipient = { $elemMatch: { user, accept: true } };
-          break;
-        case '2':
-          filter.recipient = { $elemMatch: { user } };
-          break;
-        default:
-      }
-
-      if (author === '1') {
-        filter.author = user;
-      }
   }
+  
+  switch (recipient) {
+    case '0':
+      filter.recipient = { $elemMatch: { user, accept: false } };
+      break;
+    case '1':
+      filter.recipient = { $elemMatch: { user, accept: true } };
+      break;
+    case '2':
+      filter.recipient = { $elemMatch: { user } };
+      break;
+    default:
+  }
+
+  if (author === '1') {
+    filter.author = user;
+  }
+
 
   if (lastId) {
     filter._id = { $lt: lastId };

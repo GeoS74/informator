@@ -27,8 +27,7 @@ GET /api/informator/docflow/search/doc/count
 
 Маршрут:
 ```
-GET /api/informator/docflow/search/doc
-GET /api/informator/docflow/search/doc/count
+GET /api/informator/user
 ```
 
 Параметры:
@@ -43,13 +42,6 @@ GET /api/informator/docflow/search/doc/count
 Если передаются параметры `directing` и `task` без параметров `acceptor`/`recipient`, то возвращает пользователей, которые могут взаимодействовать с данным типом документа.
 Если передаются параметры `directing` и `task`  вместе с `acceptor` и `recipient`, то возвращает пользователей, которые могут утверждать или согласовывать данный тип документа.
 
-#### Получение всех документов
-
-Маршрут:
-```
-GET /api/informator/docflow
-```
-
 #### Получение определённого документа по id 
 
 Маршрут:
@@ -57,15 +49,6 @@ GET /api/informator/docflow
 GET /api/informator/docflow/:id
 ```
 где `:id` - идентификатор документа
-
-#### Поиск документов по наименованию
-
-Маршрут:
-```
-GET /api/informator/docflow/?title=docTitle
-```
-где `docTitle` - наименование документа
-
 
 #### Добавление документа
 
