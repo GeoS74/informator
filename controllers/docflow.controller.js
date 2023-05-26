@@ -239,15 +239,17 @@ async function _processingScans(scans) {
  * - author
  *
  * Поиск: user -> doc
- * Если передаётся параметр user, то выборки возможна по документам
- * которые пользователь подписал, согласовал или является автором
  *
- * Важно: используется middleware makeAccessRightsByUser()
+ * Важно: используются middleware getMe и accessDocTypes()
  * Поиск возвращает документы доступные пользователю
  *
  * Реализация поиска:
  * 1) собрать массив доступных для пользователя типов документов
- *    примерно такого вида: [[id_direction, id_task], [id_direction, id_task], ...]
+ *    примерно такого вида: 
+ *    [
+ *      [id_direction, id_task, [id_action, ...]], 
+ *      [id_direction, id_task, [id_action, ...]], 
+ *    ...]
  * 2) добавить в фильтр условие выборки документов с учётом доступных связок напр.-тип
  *
  */
@@ -317,8 +319,8 @@ function _makeFilterRules({
   search,
   lastId,
   limit,
-  acceptor,
   user,
+  acceptor,
   recipient,
   author,
   directingId,
@@ -394,4 +396,87 @@ function _makeFilterRules({
   }
 
   return { filter, projection, limit };
+}
+
+/**
+ * подписание/ознакомление документов
+ */
+module.exports.accepting = async (ctx) => {
+  let doc = await Doc.findById(ctx.params.id)
+
+  if (!doc) {
+    ctx.throw(404, 'doc not found');
+  }
+
+  let sign = false;
+
+  for(let e of doc.acceptor) {
+    if(e.user.toString() === ctx.user.uid.toString()) {
+      e.accept = true;
+      sign = true;
+      break;
+    }
+  }
+
+  if (!sign) {
+    ctx.throw(400, 'user do not have to sign this document');
+  }
+
+  doc = await _acceptDoc(ctx.params.id, doc.acceptor);
+
+  ctx.status = 200;
+  ctx.body = mapper(doc);
+}
+
+module.exports.recipienting = async (ctx) => {
+  let doc = await Doc.findById(ctx.params.id)
+
+  if (!doc) {
+    ctx.throw(404, 'doc not found');
+  }
+
+  let sign = false;
+
+  for(let e of doc.recipient) {
+    if(e.user.toString() === ctx.user.uid.toString()) {
+      e.accept = true;
+      sign = true;
+      break;
+    }
+  }
+
+  if (!sign) {
+    ctx.throw(400, 'user do not have to sign this document');
+  }
+
+  doc = await _recipientDoc(ctx.params.id, doc.acceptor);
+
+  ctx.status = 200;
+  ctx.body = mapper(doc);
+}
+
+function _acceptDoc(id, acceptor) {
+  return Doc.findByIdAndUpdate(
+    id,
+    { acceptor },
+    { new: true },
+  )
+    .populate('acceptor.user')
+    .populate('recipient.user')
+    .populate('directing')
+    .populate('task')
+    .populate('author');
+}
+
+function _recipientDoc(id, recipient) {
+  return Doc.findByIdAndUpdate(
+    id,
+    { recipient },
+    { new: true },
+  )
+    .populate('acceptor.user')
+    .populate('recipient.user')
+    .populate('directing')
+    .populate('task')
+    .populate('author');
 }

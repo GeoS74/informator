@@ -131,6 +131,24 @@ router.patch(
   controller.deleteAtatchedFile,
 );
 
+router.patch(
+  '/accepting/:id',
+  validator.objectId,
+  validator.checkAccessDocTypesById,
+  validator.checkRightOnAccepting,
+
+  controller.accepting,
+);
+
+router.patch(
+  '/recipienting/:id',
+  validator.objectId,
+  validator.checkAccessDocTypesById,
+  validator.checkRightOnRecipienting,
+
+  controller.recipienting,
+);
+
 module.exports.routes = router.routes();
 
 // static files

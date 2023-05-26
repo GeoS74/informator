@@ -83,7 +83,7 @@ module.exports.checkRightOnDelete = async (ctx, next) => {
   await next();
 };
 
-module.exports.checkRightOnSignatoryAccept = async (ctx, next) => {
+module.exports.checkRightOnAccepting = async (ctx, next) => {
   if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Согласовать')) === -1) {
     _deleteFile(ctx.request.files);
     ctx.throw(403, 'accept to the document type is denied');
@@ -92,7 +92,7 @@ module.exports.checkRightOnSignatoryAccept = async (ctx, next) => {
   await next();
 };
 
-module.exports.checkRightOnSignatoryRecip = async (ctx, next) => {
+module.exports.checkRightOnRecipienting = async (ctx, next) => {
   if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Ознакомиться')) === -1) {
     _deleteFile(ctx.request.files);
     ctx.throw(403, 'agreed to the document type is denied');
@@ -184,7 +184,7 @@ module.exports.lastId = async (ctx, next) => {
 };
 
 module.exports.limit = async (ctx, next) => {
-  ctx.query.limit = parseInt(ctx.query.limit, 10) || 25;
+  ctx.query.limit = parseInt(ctx.query.limit, 10) || 50;
 
   await next();
 };
