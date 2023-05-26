@@ -104,8 +104,6 @@ router.patch(
   validator.objectId,
   validator.checkAccessDocTypesById,
 
-  validator.directingId,
-  validator.taskId,
   validator.title,
   validator.acceptor,
   validator.recipient,

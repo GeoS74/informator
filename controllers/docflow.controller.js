@@ -158,8 +158,6 @@ function _addDoc({
 function _updateDoc(id, {
   title,
   description,
-  directingId,
-  taskId,
   files,
   acceptor,
   recipient,
@@ -169,8 +167,6 @@ function _updateDoc(id, {
     {
       title,
       desc: description,
-      directing: directingId,
-      task: taskId,
       $push: { files },
       acceptor,
       recipient,
@@ -374,7 +370,7 @@ function _makeFilterRules({
       break;
     default:
   }
-  
+
   switch (recipient) {
     case '0':
       filter.recipient = { $elemMatch: { user, accept: false } };
