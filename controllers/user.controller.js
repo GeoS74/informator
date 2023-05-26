@@ -5,8 +5,8 @@ const logger = require('../libs/logger');
 
 const User = require('../models/User');
 const Role = require('../models/Role');
-const Action = require('../models/Action');
 const mapper = require('../mappers/user.mapper');
+const actions = require('../controllers/action.controller')
 
 /**
  * поиск пользователя
@@ -72,15 +72,13 @@ async function _searchUsers(data) {
  * записи получают каждый раз новые id
  * эти id документ не знает, соответственно клиент их передать не может
  *
- * Для решения этой проблемы создаётся ACTIONS_FROZEN_LIST
+ * Для решения этой проблемы используется FROZEN_LIST
  * по сути это список, в котором ключи - это значения из коллекции действий
  * значения - это ключи из коллекции действий
  *
  * таким образом _makeRolesByDirectingAndTask может добавлять id действий
  * в условие выборки
  */
-const ACTIONS_FROZEN_LIST = new Map();
-Action.find({}).then((res) => res.map((e) => ACTIONS_FROZEN_LIST.set(e.title, e.id)));
 
 async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recipient) {
   const filter = {
@@ -99,10 +97,10 @@ async function _makeRolesByDirectingAndTask(directingId, taskId, acceptor, recip
 
   const act = [];
   if (acceptor === '1') {
-    act.push(ACTIONS_FROZEN_LIST.get('Согласовать'));
+    act.push(actions.FROZEN_LIST.get('Согласовать'));
   }
   if (recipient === '1') {
-    act.push(ACTIONS_FROZEN_LIST.get('Ознакомиться'));
+    act.push(actions.FROZEN_LIST.get('Ознакомиться'));
   }
 
   // добавить массив действий в условие выборки

@@ -1,6 +1,22 @@
 const Action = require('../models/Action');
 const mapper = require('../mappers/action.mapper');
 
+/**
+ * Cписок действий жёстко зафиксирован и
+ * в момент создания базы данных создаётся автоматически и изменению не подлежит,
+ * записи получают каждый раз новые id
+ * эти id документ не знает, соответственно клиент их передать не может
+ *
+ * Для решения этой проблемы создаётся FROZEN_LIST
+ * по сути это список, в котором ключи - это значения из коллекции действий
+ * значения - это ключи из коллекции действий
+ *
+ * также FROZEN_LIST может вызывается функциями при этом обращений к БД нет
+ */
+
+module.exports.FROZEN_LIST = new Map();
+Action.find({}).then((res) => res.map((e) => this.FROZEN_LIST.set(e.title, e.id)));
+
 module.exports.get = async (ctx) => {
   const action = await _getAction(ctx.params.id);
 

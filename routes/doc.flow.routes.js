@@ -90,6 +90,7 @@ router.post(
   validator.directingId,
   validator.taskId,
   validator.checkAccessDocTypes,
+  validator.checkRightOnCreate,
 
   validator.title,
   validator.acceptor,
@@ -103,6 +104,7 @@ router.patch(
   koaBody(optional),
   validator.objectId,
   validator.checkAccessDocTypesById,
+  validator.checkRightOnUpdate,
 
   validator.title,
   validator.acceptor,
@@ -114,6 +116,7 @@ router.delete(
   '/:id',
   validator.objectId,
   validator.checkAccessDocTypesById,
+  validator.checkRightOnDelete,
 
   controller.delete,
 );
@@ -123,6 +126,7 @@ router.patch(
   koaBody(optional),
   validator.objectId,
   validator.checkAccessDocTypesById,
+  validator.checkRightOnUpdate,
 
   controller.deleteAtatchedFile,
 );

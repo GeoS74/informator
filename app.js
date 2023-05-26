@@ -25,7 +25,7 @@ app.use(userRoutes.static);
 app.use(roleRoutes);
 app.use(directingRoutes);
 app.use(taskRoutes);
-app.use(actionRoutes);
+// app.use(actionRoutes);
 app.use(accessSettingRoutes);
 app.use(docFlowRoutes.routes);
 app.use(docFlowRoutes.static);
