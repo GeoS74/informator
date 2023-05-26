@@ -1,6 +1,7 @@
 const fs = require('fs/promises');
 const { isValidObjectId } = require('mongoose');
 const controllerDoc = require('../../controllers/docflow.controller');
+const actions = require('../../controllers/action.controller')
 const logger = require('../../libs/logger');
 
 // ATTENTION: use this validator only after directingId and taskId validate
@@ -12,7 +13,7 @@ module.exports.checkAccessDocTypes = async (ctx, next) => {
   for (const e of ctx.accessDocTypes) {
     if (e[0] === ctx.request.body.directingId) {
       if (e[1] === ctx.request.body.taskId) {
-        ctx.accessDocTypes = e;
+        ctx.accessDocTypes = e; // валидатор сжимает массив ctx.accessDocTypes до одного элемента
         access = true;
         break;
       }
@@ -40,7 +41,7 @@ module.exports.checkAccessDocTypesById = async (ctx, next) => {
   for (const e of ctx.accessDocTypes) {
     if (e[0] === doc.directing.id.toString()) {
       if (e[1] === doc.task.id.toString()) {
-        ctx.accessDocTypes = e;
+        ctx.accessDocTypes = e; // валидатор сжимает массив ctx.accessDocTypes до одного элемента
         access = true;
         break;
       }
@@ -56,26 +57,46 @@ module.exports.checkAccessDocTypesById = async (ctx, next) => {
 };
 
 module.exports.checkRightOnCreate = async (ctx, next) => {
+  if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Создать')) === -1) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'create to the document type is denied');
+  }
 
   await next();
 };
 
 module.exports.checkRightOnUpdate = async (ctx, next) => {
+  if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Редактировать')) === -1) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'update to the document type is denied');
+  }
 
   await next();
 };
 
 module.exports.checkRightOnDelete = async (ctx, next) => {
+  if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Удалить')) === -1) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'delete to the document type is denied');
+  }
 
   await next();
 };
 
 module.exports.checkRightOnSignatoryAccept = async (ctx, next) => {
+  if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Согласовать')) === -1) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'accept to the document type is denied');
+  }
 
   await next();
 };
 
 module.exports.checkRightOnSignatoryRecip = async (ctx, next) => {
+  if( ctx.accessDocTypes[2].indexOf(actions.FROZEN_LIST.get('Ознакомиться')) === -1) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(403, 'agreed to the document type is denied');
+  }
 
   await next();
 };
