@@ -76,7 +76,7 @@ DELETE /api/informator/docflow/:id
 
 Маршрут:
 ```
-PATCH /api/informator/file/:id
+PATCH /api/informator/docflow/file/:id
 ```
 где `:id` - идентификатор документа
 
@@ -84,7 +84,7 @@ PATCH /api/informator/file/:id
 
 Маршрут:
 ```
-PATCH /api/informator/accepting/:id
+PATCH /api/informator/docflow/accepting/:id
 ```
 где `:id` - идентификатор документа
 
@@ -92,14 +92,9 @@ PATCH /api/informator/accepting/:id
 
 Маршрут:
 ```
-PATCH /api/informator/recipienting/:id
+PATCH /api/informator/docflow/recipienting/:id
 ```
 где `:id` - идентификатор документа
-
-
-
-
-
 
 
 ## API пользователей

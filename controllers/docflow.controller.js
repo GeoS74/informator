@@ -449,7 +449,7 @@ module.exports.recipienting = async (ctx) => {
     ctx.throw(400, 'user do not have to sign this document');
   }
 
-  doc = await _recipientDoc(ctx.params.id, doc.acceptor);
+  doc = await _recipientDoc(ctx.params.id, doc.recipient);
 
   ctx.status = 200;
   ctx.body = mapper(doc);
