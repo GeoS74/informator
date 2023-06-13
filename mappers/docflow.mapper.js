@@ -15,7 +15,7 @@ module.exports = (data) => ({
     uid: data.author._id,
     email: data.author.email,
     name: data.author.name,
-    fullName: data.author.fullName,
+    position: data.author.position,
   },
   files: data.files.map((f) => ({
     originalName: f.originalName,
@@ -25,14 +25,14 @@ module.exports = (data) => ({
     uid: e.user._id,
     email: e.user.email,
     name: e.user.name,
-    fullName: e.user.fullName,
+    position: e.user.position,
     accept: e.accept,
   })),
   recipient: data.recipient.map((e) => ({
     uid: e.user._id,
     email: e.user.email,
     name: e.user.name,
-    fullName: e.user.fullName,
+    position: e.user.position,
     accept: e.accept,
   })),
 

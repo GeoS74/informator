@@ -3,6 +3,7 @@ module.exports = (data) => ({
   email: data.email,
   photo: data.photo || '',
   name: data.name || '',
+  position: data.position || '',
 
   roles: data.roles.map((role) => ({
     id: role.id,
