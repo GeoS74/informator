@@ -45,9 +45,9 @@ const router = new Router({ prefix: '/api/informator/docflow' });
  */
 
 router.use(
-  accessCheck, 
-  validator.email, 
-  controller.getMe, 
+  accessCheck,
+  validator.email,
+  controller.getMe,
   controller.accessDocTypes,
 );
 

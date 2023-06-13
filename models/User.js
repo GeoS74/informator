@@ -17,6 +17,7 @@ const Schema = new mongoose.Schema({
   name: String,
   photo: String,
   fullName: String,
+  position: String,
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
@@ -27,27 +28,31 @@ const Schema = new mongoose.Schema({
  * создание и обновление поля fullName пользователя
  */
 Schema.pre('save', setFullName);
-Schema.pre('findOneAndUpdate', updateFullName);
 
 function setFullName() {
   this.fullName = getFullName.call(this);
 }
 
 function getFullName() {
-  if (this.email && this.name) {
-    return `${this.name || ''} ${this.email}`;
-  }
-  return undefined;
+  return (`${this.name || ''} ${this.email} ${this.position || ''}`).trim();
 }
 
-function updateFullName() {
-  const email = this.getFilter()?.email;
-  const name = this.getUpdate()?.name;
-
-  this.setUpdate({
-    fullName: getFullName.call({ email, name }),
-    ...this.getUpdate(),
-  });
-}
+Schema.methods.setPosition = function sp() {
+  this.position = this.roles[0]?.title;
+  return this;
+};
 
 module.exports = connection.model('User', Schema);
+
+// справочно: пример использования middleware для 'findOneAndUpdate'
+//
+// Schema.pre('findOneAndUpdate', updateFullName);
+// function updateFullName() {
+//   const email = this.getFilter()?.email;
+//   const name = this.getUpdate()?.name;
+
+//   this.setUpdate({
+//     fullName: getFullName.call({ email, name }),
+//     ...this.getUpdate(),
+//   });
+// }

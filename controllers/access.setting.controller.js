@@ -26,6 +26,9 @@ module.exports.bundleRole = async (ctx) => {
     ctx.throw(404, 'user not found');
   }
 
+  // обновить название должности и fullName
+  await user.setPosition().save();
+
   ctx.status = 200;
   ctx.body = userMapper(user);
 };

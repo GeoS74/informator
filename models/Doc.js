@@ -11,6 +11,8 @@ const Signatory = new mongoose.Schema({
     index: true,
   },
   accept: Boolean,
+}, {
+  timestamps: true,
 });
 
 const Schema = new mongoose.Schema({

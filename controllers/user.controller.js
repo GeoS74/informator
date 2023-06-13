@@ -6,7 +6,7 @@ const logger = require('../libs/logger');
 const User = require('../models/User');
 const Role = require('../models/Role');
 const mapper = require('../mappers/user.mapper');
-const actions = require('../controllers/action.controller')
+const actions = require('./action.controller');
 
 /**
  * поиск пользователя
@@ -174,6 +174,9 @@ module.exports.update = async (ctx) => {
   if (!user) {
     ctx.throw(404, 'user not found');
   }
+
+  // обновить название должности и fullName
+  await user.setPosition().save();
 
   ctx.status = 200;
   ctx.body = mapper(user);

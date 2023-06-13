@@ -1,3 +1,4 @@
+const User = require('../models/User');
 const Role = require('../models/Role');
 const mapper = require('../mappers/role.mapper');
 
@@ -32,6 +33,15 @@ module.exports.update = async (ctx) => {
   if (!role) {
     ctx.throw(404, 'role not found');
   }
+
+  // обновить название должности и fullName у всех пользователей с этой ролью
+  // обязательно использовать populate('roles'), иначе setPosition отработает не правильно
+  User.find({ roles: role._id })
+    .populate('roles')
+    .then((users) => {
+      users.map((u) => u.setPosition().save());
+    });
+
   ctx.status = 200;
   ctx.body = mapper(role);
 };

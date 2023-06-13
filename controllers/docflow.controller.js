@@ -22,7 +22,7 @@ module.exports.accessDocTypes = async (ctx, next) => {
         ctx.accessDocTypes.push([
           directing.id,
           task.id,
-          task.actions.map(action => action.id)
+          task.actions.map((action) => action.id),
         ])
       ))
     ))
@@ -245,10 +245,10 @@ async function _processingScans(scans) {
  *
  * Реализация поиска:
  * 1) собрать массив доступных для пользователя типов документов
- *    примерно такого вида: 
+ *    примерно такого вида:
  *    [
- *      [id_direction, id_task, [id_action, ...]], 
- *      [id_direction, id_task, [id_action, ...]], 
+ *      [id_direction, id_task, [id_action, ...]],
+ *      [id_direction, id_task, [id_action, ...]],
  *    ...]
  * 2) добавить в фильтр условие выборки документов с учётом доступных связок напр.-тип
  *
@@ -390,7 +390,6 @@ function _makeFilterRules({
     filter.author = user;
   }
 
-
   if (lastId) {
     filter._id = { $lt: lastId };
   }
@@ -402,7 +401,7 @@ function _makeFilterRules({
  * подписание/ознакомление документов
  */
 module.exports.accepting = async (ctx) => {
-  let doc = await Doc.findById(ctx.params.id)
+  let doc = await Doc.findById(ctx.params.id);
 
   if (!doc) {
     ctx.throw(404, 'doc not found');
@@ -410,8 +409,8 @@ module.exports.accepting = async (ctx) => {
 
   let sign = false;
 
-  for(let e of doc.acceptor) {
-    if(e.user.toString() === ctx.user.uid.toString()) {
+  for (const e of doc.acceptor) {
+    if (e.user.toString() === ctx.user.uid.toString()) {
       e.accept = true;
       sign = true;
       break;
@@ -426,10 +425,10 @@ module.exports.accepting = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = mapper(doc);
-}
+};
 
 module.exports.recipienting = async (ctx) => {
-  let doc = await Doc.findById(ctx.params.id)
+  let doc = await Doc.findById(ctx.params.id);
 
   if (!doc) {
     ctx.throw(404, 'doc not found');
@@ -437,8 +436,8 @@ module.exports.recipienting = async (ctx) => {
 
   let sign = false;
 
-  for(let e of doc.recipient) {
-    if(e.user.toString() === ctx.user.uid.toString()) {
+  for (const e of doc.recipient) {
+    if (e.user.toString() === ctx.user.uid.toString()) {
       e.accept = true;
       sign = true;
       break;
@@ -453,7 +452,7 @@ module.exports.recipienting = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = mapper(doc);
-}
+};
 
 function _acceptDoc(id, acceptor) {
   return Doc.findByIdAndUpdate(
