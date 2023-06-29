@@ -15,10 +15,14 @@ module.exports = async (ctx, next) => {
     // errors mongoDB
     if (error.name) {
       ctx.status = 400;
-
       switch (error.name) {
-        case 'CastError':
-          ctx.body = { error: 'invalid sum' };
+        case 'CastError': // value does not match model type
+          if (error.message.indexOf('path "deadLine"') !== -1) {
+            ctx.body = { error: 'invalid deadLine' };
+          }
+          if (error.message.indexOf('path "sum"') !== -1) {
+            ctx.body = { error: 'invalid sum' };
+          }
           return;
         case 'TypeError':
         case 'ValidationError':
