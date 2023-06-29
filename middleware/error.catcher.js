@@ -17,6 +17,9 @@ module.exports = async (ctx, next) => {
       ctx.status = 400;
 
       switch (error.name) {
+        case 'CastError':
+          ctx.body = { error: 'invalid sum' };
+          return;
         case 'TypeError':
         case 'ValidationError':
           ctx.body = { error: error.message };

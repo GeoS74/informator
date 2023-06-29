@@ -38,4 +38,7 @@ module.exports = (data) => ({
 
   createdAt: data.createdAt,
   updatedAt: data.updatedAt,
+
+  deadLine: data.deadLine,
+  sum: data.sum,
 });

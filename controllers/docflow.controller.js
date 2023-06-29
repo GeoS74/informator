@@ -136,6 +136,8 @@ function _addDoc({
   files,
   acceptor,
   recipient,
+  deadLine,
+  sum,
 }) {
   return Doc.create({
     title,
@@ -146,6 +148,8 @@ function _addDoc({
     files,
     acceptor,
     recipient,
+    deadLine,
+    sum,
   })
     .then((doc) => Doc.findById(doc._id)
       .populate('acceptor.user')
@@ -161,6 +165,8 @@ function _updateDoc(id, {
   files,
   acceptor,
   recipient,
+  deadLine,
+  sum,
 }) {
   return Doc.findByIdAndUpdate(
     id,
@@ -170,6 +176,8 @@ function _updateDoc(id, {
       $push: { files },
       acceptor,
       recipient,
+      deadLine,
+      sum,
     },
     {
       new: true,

@@ -47,6 +47,10 @@ const Schema = new mongoose.Schema({
     required: 'не заполнено обязательное поле {PATH}',
   },
   files: [{ originalName: String, fileName: String }],
+
+  // поля для документа типа: Счёт
+  deadLine: Date,
+  sum: Number,
 }, {
   timestamps: true,
 });
